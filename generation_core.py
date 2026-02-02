@@ -32,44 +32,6 @@ class SKUConfig:
         self.h_px = int(height_cm * self.dpi)
         self.half_w_px = int(self.w_px / 2) # 顶盖和底盖通常是宽的一半
         self.bottom_gb_h_px = int(self.bottom_gb_h * self.dpi)
-    def get_layout_config(self):
-        """
-        按照 [侧面, 正面, 侧面, 正面] 的顺序定义横向坐标 (X)
-        以及 [顶盖, 正身, 底盖] 的顺序定义纵向坐标 (Y)
-        """
-        # 定义 X 轴的关键节点
-        x0 = 0
-        x1 = self.l_px 
-        x2 = self.w_px + self.l_px
-        x3 = self.w_px + self.l_px * 2
-         
-        # 定义 Y 轴的关键节点
-        y0 = 0                             # 顶盖顶部
-        y1 = self.half_w_px                # 正身顶部
-        y2 = self.half_w_px + self.h_px    # 底盖顶部
-        
-        # 设置四个面的
-        
-        # 重新命名的布局字典，更符合纸箱结构
-        return {
-            # 第一行：顶盖层 (Top Flaps)
-            "flap_top_front1":  (x0, y0, self.l_px, self.half_w_px),
-            "flap_top_side1": (x1, y0, self.w_px, self.half_w_px),
-            "flap_top_front2":  (x2, y0, self.l_px, self.half_w_px),
-            "flap_top_side2": (x3, y0, self.w_px, self.half_w_px),
-
-            # 第二行：正身层 (Main Body)
-            "panel_front1":     (x0, y1, self.l_px, self.h_px),
-            "panel_side1":    (x1, y1, self.w_px, self.h_px),
-            "panel_front2":     (x2, y1, self.l_px, self.h_px),
-            "panel_side2":    (x3, y1, self.w_px, self.h_px),
-
-            # 第三行：底盖层 (Bottom Flaps)
-            "flap_btm_front1":  (x0, y2, self.l_px, self.half_w_px),
-            "flap_btm_side1": (x1, y2, self.w_px, self.half_w_px),
-            "flap_btm_front2":  (x2, y2, self.l_px, self.half_w_px),
-            "flap_btm_side2": (x3, y2, self.w_px, self.half_w_px),
-        }
 
 class BoxMarkEngine:
     def __init__(self, base_dir, ppi=300):
@@ -77,19 +39,19 @@ class BoxMarkEngine:
         self.ppi = ppi
     
         self.resources = {
-            'icon_left_2_panel': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '顶部-左-2箱.png').convert('RGBA'),
-            'icon_left_3_panel': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '顶部-左-3箱.png').convert('RGBA'),
-            'icon_right_2-1_panel': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '顶部-右-2-1.png').convert('RGBA'),
-            'icon_right_3-1_panel': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '顶部-右-3-1.png').convert('RGBA'),
-            'icon_trademark': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '正唛logo.png').convert('RGBA'),
-            'icon_company': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '正唛公司信息.png').convert('RGBA'),
-            'icon_box_number_1': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '正唛 Box 1.png').convert('RGBA'),
-            'icon_box_number_2': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '正唛 Box 2.png').convert('RGBA'),
-            'icon_box_number_3': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '正唛 Box 3.png').convert('RGBA'),
-            'icon_side_label_box': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '侧唛标签框.png').convert('RGBA'),
-            'icon_side_logo': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '侧唛logo.png').convert('RGBA'),
-            'icon_side_text_box': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '侧唛文本框.png').convert('RGBA'),
-            'icon_side_sponge': Image.open(base_dir / 'MCombo箱唛打样文件' / '矢量文件' / '1箱' / '海绵认证.png').convert('RGBA')
+            'icon_left_2_panel': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '顶部-左-2箱.png').convert('RGBA'),
+            'icon_left_3_panel': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '顶部-左-3箱.png').convert('RGBA'),
+            'icon_right_2-1_panel': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '顶部-右-2-1.png').convert('RGBA'),
+            'icon_right_3-1_panel': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '顶部-右-3-1.png').convert('RGBA'),
+            'icon_trademark': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '正唛logo.png').convert('RGBA'),
+            'icon_company': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '正唛公司信息.png').convert('RGBA'),
+            'icon_box_number_1': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '正唛 Box 1.png').convert('RGBA'),
+            'icon_box_number_2': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '正唛 Box 2.png').convert('RGBA'),
+            'icon_box_number_3': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '正唛 Box 3.png').convert('RGBA'),
+            'icon_side_label_box': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '侧唛标签框.png').convert('RGBA'),
+            'icon_side_logo': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '侧唛logo.png').convert('RGBA'),
+            'icon_side_text_box': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '侧唛文本框.png').convert('RGBA'),
+            'icon_side_sponge': Image.open(base_dir / 'assets' / 'Mcombo' /  '样式一' /'矢量文件' / '海绵认证.png').convert('RGBA')
         }
         
         # 字体大小相对比例（基于参考箱子：77x67.5x47cm, ppi=72）
@@ -102,15 +64,52 @@ class BoxMarkEngine:
             'side_font': 40 / 1332         # 40px / 1332 ≈ 0.030
         }
     
+    def get_layout_config(self, sku_config):
+        """
+        按照 [侧面, 正面, 侧面, 正面] 的顺序定义横向坐标 (X)
+        以及 [顶盖, 正身, 底盖] 的顺序定义纵向坐标 (Y)
+        """
+        # 定义 X 轴的关键节点
+        x0 = 0
+        x1 = sku_config.l_px 
+        x2 = sku_config.w_px + sku_config.l_px
+        x3 = sku_config.w_px + sku_config.l_px * 2
+         
+        # 定义 Y 轴的关键节点
+        y0 = 0                             # 顶盖顶部
+        y1 = sku_config.half_w_px                # 正身顶部
+        y2 = sku_config.half_w_px + sku_config.h_px    # 底盖顶部
+        
+        # 重新命名的布局字典，更符合纸箱结构
+        return {
+            # 第一行：顶盖层 (Top Flaps)
+            "flap_top_front1":  (x0, y0, sku_config.l_px, sku_config.half_w_px),
+            "flap_top_side1": (x1, y0, sku_config.w_px, sku_config.half_w_px),
+            "flap_top_front2":  (x2, y0, sku_config.l_px, sku_config.half_w_px),
+            "flap_top_side2": (x3, y0, sku_config.w_px, sku_config.half_w_px),
+
+            # 第二行：正身层 (Main Body)
+            "panel_front1":     (x0, y1, sku_config.l_px, sku_config.h_px),
+            "panel_side1":    (x1, y1, sku_config.w_px, sku_config.h_px),
+            "panel_front2":     (x2, y1, sku_config.l_px, sku_config.h_px),
+            "panel_side2":    (x3, y1, sku_config.w_px, sku_config.h_px),
+
+            # 第三行：底盖层 (Bottom Flaps)
+            "flap_btm_front1":  (x0, y2, sku_config.l_px, sku_config.half_w_px),
+            "flap_btm_side1": (x1, y2, sku_config.w_px, sku_config.half_w_px),
+            "flap_btm_front2":  (x2, y2, sku_config.l_px, sku_config.half_w_px),
+            "flap_btm_side2": (x3, y2, sku_config.w_px, sku_config.half_w_px),
+        }
+    
     def _get_fonts_path(self):
         """获取所有字体文件的路径"""
         return {
-            'calibri_bold': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' / 'calibri_blod.ttf'),
-            'itc_demi': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' / 'ITC Avant Garde Gothic LT Demi.ttf'),
-            'courier': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' / 'cour.ttf'),
-            'side_font_label': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' /'ITC Avant Garde Gothic LT Demi.ttf'),
-            'side_font_bold': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' / 'calibri_blod.ttf'),
-            'side_font_barcode': str(self.base_dir / 'MCombo箱唛打样文件' / '箱唛字体' / 'calibri_blod.ttf')
+            'calibri_bold': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' / 'calibri_blod.ttf'),
+            'itc_demi': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' / 'ITC Avant Garde Gothic LT Demi.ttf'),
+            'courier': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' / 'cour.ttf'),
+            'side_font_label': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' /'ITC Avant Garde Gothic LT Demi.ttf'),
+            'side_font_bold': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' / 'calibri_blod.ttf'),
+            'side_font_barcode': str(self.base_dir / 'assets' / 'Mcombo' /  '样式一' / '箱唛字体' / 'calibri_blod.ttf')
         }
     
     def _get_fonts(self, sku_config):
@@ -325,7 +324,7 @@ class BoxMarkEngine:
 
 def visualize_layout(sku_config, BoxMarkEngine):
     # 1. 获取布局数据
-    layout = sku_config.get_layout_config()
+    layout = BoxMarkEngine.get_layout_config(sku_config)
     
     # 2. 计算画布总尺寸
     # 总宽 = 2*L + 2*W, 总高 = H + W (顶盖+底盖)
