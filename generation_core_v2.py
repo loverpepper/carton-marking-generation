@@ -34,6 +34,9 @@ class SKUConfig:
         self.l_cm = length_cm
         self.w_cm = width_cm
         self.h_cm = height_cm
+        self.l_in = length_cm / 2.54
+        self.w_in = width_cm / 2.54
+        self.h_in = height_cm / 2.54
         self.bottom_gb_h = bottom_gb_h_cm
         self.style_name = style_name
         self.dpi = ppi / 2.54
@@ -130,7 +133,6 @@ if __name__ == "__main__":
     sku_text = {
         'gw_value': 188.8,
         'nw_value': 94.4,
-        'dimention_text': f'BOX SIZE: 30.3\'\' x 26.6\'\' x 18.5\'\'',
         'sn_code': '08429383723953'
     }
 

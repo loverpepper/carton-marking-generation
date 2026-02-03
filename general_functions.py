@@ -346,9 +346,9 @@ def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
     # 根据目标图，右上角单元格起点大约在表格总宽的 65% 处
     text_x_start = tw * 0.651
     side_weight_text = f'G.W./N.W.: {sku_config.side_text["gw_value"]} / {sku_config.side_text["nw_value"]} lbs'
-    
+    side_dimention_text = f'BOX SIZE: {sku_config.l_in:.1f}\'\' x {sku_config.w_in:.1f}\'\' x {sku_config.h_in:.1f}\'\''
     draw.text((text_x_start, th * 0.044), side_weight_text, font=side_font_label, fill=(0,0,0))
-    draw.text((text_x_start, th * 0.214), sku_config.side_text['dimention_text'], font=side_font_label, fill=(0,0,0))
+    draw.text((text_x_start, th * 0.214), side_dimention_text, font=side_font_label, fill=(0,0,0))
     
     # --- 区域 2: 条形码区 (分为左右两个子区域) ---
     # 定义在这个局部表格内的中轴线

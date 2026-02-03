@@ -19,7 +19,7 @@ class MComboStandardStyle(BoxMarkStyle):
         return "MCombo 标准箱唛样式 - 带公司Logo、SKU信息、条形码"
     
     def get_required_params(self):
-        return ['color', 'product', 'size', 'side_text', 'box_number', 'sponge_verified']
+        return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'size', 'side_text', 'sku_name', 'box_number', 'sponge_verified']
     
     def get_layout_config(self, sku_config):
         """MCombo 标准样式 - 12块布局（4列3行）"""
