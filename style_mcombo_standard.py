@@ -147,8 +147,8 @@ class MComboStandardStyle(BoxMarkStyle):
     
     def generate_left_panel(self, sku_config):
         """生成左侧面板"""
-        canvas_left_up = Image.new('RGB', (sku_config.l_px, sku_config.half_w_px), (161,142,102))
-        canvas_left_down = Image.new('RGB', (sku_config.l_px, sku_config.half_w_px), (161,142,102))
+        canvas_left_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
+        canvas_left_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
 
         total_box_number = sku_config.box_number['total_boxes']
         icon_left_panel = self.resources[f'icon_left_{total_box_number}_panel']
@@ -164,8 +164,8 @@ class MComboStandardStyle(BoxMarkStyle):
     
     def generate_right_panel(self, sku_config):
         """生成右侧面板"""
-        canvas_right_up = Image.new('RGB', (sku_config.l_px, sku_config.half_w_px), (161,142,102))
-        canvas_right_down = Image.new('RGB', (sku_config.l_px, sku_config.half_w_px), (161,142,102))
+        canvas_right_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
+        canvas_right_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
         
         total_box_number = sku_config.box_number['total_boxes']
         icon_right_panel = self.resources[f'icon_right_{total_box_number}-1_panel']
@@ -181,7 +181,7 @@ class MComboStandardStyle(BoxMarkStyle):
     
     def generate_front_panel(self, sku_config):
         """生成正面面板"""
-        canvas = Image.new('RGB', (sku_config.l_px, sku_config.h_px), (161,142,102))
+        canvas = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.h_px), sku_config.background_color)
         icon_trademark = self.resources['icon_trademark']
         
         fonts = self._get_fonts(sku_config)
@@ -257,7 +257,7 @@ class MComboStandardStyle(BoxMarkStyle):
     
     def generate_side_panel(self, sku_config):
         """生成侧面面板"""
-        canvas = Image.new('RGB', (sku_config.w_px, sku_config.h_px), (161,142,102))
+        canvas = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.h_px), sku_config.background_color)
         
         general_functions.draw_side_dynamic_bottom_bg(
             canvas, sku_config, self.resources['icon_company'], self.font_paths)

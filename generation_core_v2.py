@@ -8,6 +8,7 @@ from style_base import StyleRegistry
 
 # 导入所有样式模块以自动注册
 import style_mcombo_standard
+import style_barberpub_topandbottom
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -41,6 +42,9 @@ class SKUConfig:
         self.style_name = style_name
         self.dpi = ppi / 2.54
         self.ppi = ppi
+        self.color_mode = 'RGB'  # 默认颜色模式
+        self.background_color = (161, 142, 102)  # 默认RGB背景色
+        # self.background_color = (0, 12, 37, 37)  # 默认CMYK背景色，颜色设置还有问题
         
         # 预计算像素值
         self.l_px = int(length_cm * self.dpi)
@@ -79,9 +83,10 @@ class BoxMarkGenerator:
         max_x = max(x + w for x, y, w, h in layout.values())
         max_y = max(y + h for x, y, w, h in layout.values())
         
-        # 创建画布
-        canvas = Image.new('RGB', (int(max_x), int(max_y)), (161,142,102))
-        
+        # 创建画布（白色背景，未填充的区域将显示为白色）
+   
+        canvas = Image.new(sku_config.color_mode, (int(max_x), int(max_y)), (255, 255, 255)) # RGB白色背景
+        # canvas = Image.new('CMYK', (int(max_x), int(max_y)), (0,0,0,0))  # CMYK透明背景（未填充区域为白色）
         # 3. 让样式生成它需要的所有面板（动态适配不同样式）
         panels_dict = self.style.generate_all_panels(sku_config)
         
@@ -102,11 +107,16 @@ class BoxMarkGenerator:
     
     def save_as_pdf(self, canvas, output_path, sku_config):
         """保存为 PDF 格式（与旧版保持一致：先转CMYK再转回RGB）"""
+        canvas.show()
+        
         # 由RGB转CMYK以便印刷（用于颜色校准）
-        canvas_cmyk = canvas.convert('CMYK')
+        # canvas_cmyk = canvas.convert('CMYK')
         # PDF需要RGB模式
-        canvas_rgb = canvas_cmyk.convert('RGB')
-        canvas_rgb.save(output_path, "PDF", resolution=sku_config.ppi, quality=100)
+        # canvas_rgb = canvas_cmyk.convert('RGB')
+        canvas.save(output_path, "PDF", resolution=sku_config.ppi, quality=100)
+        # canvas_rgb.save(output_path, "PDF", resolution=sku_config.ppi, quality=100)
+        
+        
         
         total_width, total_height = canvas.size
         print(f"✅ 箱唛已生成为PDF！文件: {output_path}")
@@ -131,36 +141,37 @@ def visualize_layout(sku_config, generator):
 if __name__ == "__main__":
     # 使用新框架生成箱唛
     sku_text = {
-        'gw_value': 188.8,
-        'nw_value': 94.4,
-        'sn_code': '08429383723953'
+        'gw_value': 66.2,
+        'nw_value': 95.9,
+        'sn_code': '08429383723953',
+        'origin_text':'MADE IN CHINA',
     }
 
     box_number = {
-        'total_boxes': 3,
+        'total_boxes': 1,
         'current_box': 1
     }
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6160-R7096BE-1",
-        length_cm=79,
-        width_cm=68,
-        height_cm=47,
-        style_name="mcombo_standard",  # 指定样式
+        sku_name="6154-2098W",
+        length_cm=71,
+        width_cm=45,
+        height_cm=30,
+        style_name="barberpub_topandbottom",  # 指定样式
         ppi=150,
-        # MCombo 标准样式的特定参数
-        color='Beige',
-        product='Lift Recliner',
-        size='(Medium-Wide)',
+
+        color='WHITE',
+        product='Salon Trolley',
+        size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
-        sponge_verified=True
+        sponge_verified=True # 是否通过海绵测试, 可选参数, 有些样式会用到
     )
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_standard", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_topandbottom", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

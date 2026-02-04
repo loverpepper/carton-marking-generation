@@ -39,10 +39,10 @@ class BoxMarkStyle(ABC):
     #     """生成右侧面板（上下）"""
     #     pass
     
-    @abstractmethod
-    def generate_front_panel(self, sku_config):
-        """生成正面面板"""
-        pass
+    # @abstractmethod
+    # def generate_front_panel(self, sku_config):
+    #     """生成正面面板"""
+    #     pass
     
     # @abstractmethod
     # def generate_side_panel(self, sku_config):

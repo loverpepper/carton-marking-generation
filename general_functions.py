@@ -5,8 +5,17 @@ import barcode
 from barcode.writer import ImageWriter
 base_dir = Path.Path(__file__).parent
 
+'''
+已有的函数千万别动，但是可以调用它们，或者复制粘贴到新的函数里修改
+可以在后面无限加自己的函数
+
+'''
+
 
 def paste_center_with_height(canvas, icon, height_cm, dpi):
+    """
+    将 icon 按照指定高度等比例缩放后，居中粘贴到 canvas 上
+    """
     # 1. 计算目标高度的像素值 (10cm)
     # 300 PPI 下，1英寸=2.54cm，所以 10cm 对应的像素如下：
     target_height_px = int(height_cm * dpi)  # 10 cm 转像素
@@ -37,6 +46,12 @@ def scale_by_height(image, target_height):
     """根据目标高度等比例缩放图片"""
     w, h = image.size
     target_width = int(w * (target_height / h))
+    return image.resize((target_width, target_height), Image.Resampling.LANCZOS)
+
+def scale_by_width(image, target_width):
+    """根据目标宽度等比例缩放图片"""
+    w, h = image.size
+    target_height = int(h * (target_width / w))
     return image.resize((target_width, target_height), Image.Resampling.LANCZOS)
 
 def draw_rounded_bg_for_text(draw, bbox, sku_config, color_xy,
@@ -74,6 +89,8 @@ def draw_rounded_bg_for_text(draw, bbox, sku_config, color_xy,
 
 def draw_smooth_ellipse(draw, canvas, box, fill=(0, 0, 0), scale=4):
     """
+    可以用于Mconbo两种样式正唛产品名下方的椭圆形装饰
+    在指定的 box 区域内绘制一个丝滑的椭圆形（抗锯齿）
     scale: 放大倍数，越高越丝滑，通常 4 足够。
     """
     x0, y0, x1, y1 = box
@@ -324,6 +341,12 @@ def draw_side_dynamic_bottom_bg(canvas, sku_config, icon_company, font_paths):
     pass
 
 def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
+    """
+    Mcombo 两种样式专用
+    用于给侧唛表格区域填充动态文字和条码 
+    在侧唛的右侧表格区域内绘制动态文字和条码
+    然后返回给调用者进行粘贴
+    """
     # 此时 tw, th 仅代表右侧那个格子的宽高
     tw, th = icon_side_text_box_resized.size
     draw = ImageDraw.Draw(icon_side_text_box_resized)
@@ -380,7 +403,7 @@ def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
     draw.text((right_zone_center - sn_w/2, barcode_text_y), sn_code, font=side_font_barcode_text, fill=(0,0,0))
     
     # --- 区域 3: 底部 MADE IN CHINA (在当前局部表格内绝对居中) ---
-    made_text = "MADE IN CHINA"
+    made_text = sku_config.side_text['origin_text']
     made_w = draw.textlength(made_text, font=side_font_bold)
     draw.text(( tw * 0.51 , th * 0.87 ), made_text, font=side_font_bold, fill=(0,0,0))
     
@@ -407,5 +430,208 @@ def generate_barcode_image(code_str, width, height):
     img.putdata(new_data)
     
     return img.resize((width, height), Image.LANCZOS)
+
+def generate_barcode_with_text(code_str, width, height):
+    """
+    生成带文字的透明背景条形码，根据目标尺寸动态调整参数避免变形
+    这个函数不推荐使用，自带的文本字体非常古早
+    建议使用 generate_barcode_image 生成纯条码后手动绘制文字
+    """
+    import barcode
+    from barcode.writer import ImageWriter
+    from PIL import Image
+
+    Code128 = barcode.get_barcode_class("code128")
+    bar = Code128(code_str, writer=ImageWriter())
     
+    # 根据目标尺寸动态计算参数
+    # 字体大小约为高度的14%
+    font_size = max(12, int(height * 0.14))
+    # 条码高度大幅减小到35%（为文字留出充足空间）
+    module_height = max(6.0, height * 0.35 / 10)  # module_height单位是mm
+    # 文字和条码之间的距离大幅增加到15%
+    text_distance = max(5.0, height * 0.15 / 10)
     
+    options = {
+        "write_text": True,           # 开启底部文字
+        "font_size": font_size,       # 动态字体大小
+        "text_distance": text_distance, # 动态文字距离（增大）
+        "module_height": module_height, # 动态条码高度（减小）
+        "quiet_zone": 2.0,            # 左右留白宽度
+        "background": 'white',        # 显式指定背景白
+        "foreground": 'black'         # 显式指定前景色黑
+    }
+    
+    # 渲染原始图片
+    img = bar.render(writer_options=options)
+    
+    # 转换为透明背景
+    img = img.convert("RGBA")
+    datas = img.getdata()
+    new_data = []
+    
+    for item in datas:
+        # 将白色背景转为透明
+        if item[0] > 220 and item[1] > 220 and item[2] > 220:
+            new_data.append((255, 255, 255, 0))
+        else:
+            new_data.append(item)
+            
+    img.putdata(new_data)
+    
+    # 使用高质量缩放，保持长宽比
+    return img.resize((width, height), Image.LANCZOS)
+
+
+def get_max_font_size(text, font_path, target_width, max_height=None, min_size=10, max_size=500):
+    """
+    动态寻找能让文字适应目标宽度的最大字号
+    
+    参数:
+        text: 要绘制的文字
+        font_path: 字体文件路径
+        target_width: 目标宽度（像素）
+        max_height: 最大高度限制（像素），可选
+        min_size: 最小字号
+        max_size: 最大字号
+    
+    返回:
+        适合的字号大小
+    """
+    # 创建临时绘图对象用于测量
+    temp_img = Image.new('RGB', (1, 1))
+    draw = ImageDraw.Draw(temp_img)
+    
+    # 二分查找最佳字号
+    best_size = min_size
+    low, high = min_size, max_size
+    
+    while low <= high:
+        mid = (low + high) // 2
+        font = ImageFont.truetype(font_path, mid)
+        
+        # 获取文字的边界框
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        
+        # 检查宽度是否符合
+        width_ok = text_width <= target_width
+        # 检查高度是否符合（如果有高度限制）
+        height_ok = max_height is None or text_height <= max_height
+        
+        if width_ok and height_ok:
+            best_size = mid
+            low = mid + 1  # 尝试更大的字号
+        else:
+            high = mid - 1  # 字号太大，减小
+    
+    return best_size
+    
+def fill_left_and_right_label_barberpub_topandbottom(sku_config, img_label_resized, fonts_paths):
+    """
+    填充 Barberpub 天地盖样式左右侧面板的标签区域
+    
+    功能：只填充顶部的两个条形码（SKU + SN码），底部4个运输标识图片自带
+    使用 generate_barcode_image 生成纯条形码，然后手动绘制文字
+    """
+    tw, th = img_label_resized.size
+    draw = ImageDraw.Draw(img_label_resized)
+    
+    # 加载字体
+    font_path = fonts_paths['CentSchbook BT']
+    
+    # ========== 顶部条形码区域（约35%高度）==========
+    barcode_zone_h = int(th * 0.35)
+    
+    # 纯条形码高度（不含文字）：占条形码区域的85%（增大）
+    barcode_only_h = int(barcode_zone_h * 0.89)
+    # 条形码顶部间距：10% 
+    barcode_y = int(barcode_zone_h * 0.10)
+    
+    # 文字高度：占条形码区域的22%（增大）
+    text_font_size = int(barcode_zone_h * 0.22)
+    text_font = ImageFont.truetype(font_path, text_font_size)
+    # 文字位置：条形码下方，留出2%的小间距，让文字更靠近底部
+    text_y = barcode_y + barcode_only_h + int(barcode_zone_h * 0.01)
+    
+    # ========== 左侧 SKU 条形码（占宽度的52%，比SN更宽）==========
+    sku_name = sku_config.sku_name
+    sku_barcode_w = int(tw * 0.52)
+    sku_barcode_x = int(tw * 0.01)  # 左边距1%
+    
+    # 生成纯条形码（不带文字）
+    sku_barcode_img = generate_barcode_image(sku_name, width=sku_barcode_w, height=barcode_only_h)
+    img_label_resized.paste(sku_barcode_img, (sku_barcode_x, barcode_y), mask=sku_barcode_img)
+    
+    # 在条形码下方居中绘制文字
+    sku_text_w = draw.textlength(sku_name, font=text_font)
+    sku_text_x = sku_barcode_x + (sku_barcode_w - sku_text_w) // 2
+    draw.text((sku_text_x, text_y), sku_name, font=text_font, fill=(0, 0, 0))
+    
+    # ========== 右侧 SN 条形码（占宽度的42%）==========
+    sn_code = sku_config.side_text['sn_code']
+    sn_barcode_w = int(tw * 0.42)
+    sn_barcode_x = int(tw * 0.56)  # 从56%位置开始（留4%间距）
+    
+    # 生成纯条形码（不带文字）
+    sn_barcode_img = generate_barcode_image(sn_code, width=sn_barcode_w, height=barcode_only_h)
+    img_label_resized.paste(sn_barcode_img, (sn_barcode_x, barcode_y), mask=sn_barcode_img)
+    
+    # 在条形码下方居中绘制文字
+    sn_text_w = draw.textlength(sn_code, font=text_font)
+    sn_text_x = sn_barcode_x + (sn_barcode_w - sn_text_w) // 2
+    draw.text((sn_text_x, text_y), sn_code, font=text_font, fill=(0, 0, 0))
+    
+    return img_label_resized
+
+def draw_diagonal_stripes(canvas, stripe_height_cm, dpi, bottom_margin_cm=0, stripe_width_px=30, stripe_color=(0, 0, 0), bg_color=(255, 255, 255)):
+    """
+    在画布底部绘制黑白斜纹条块（通用函数）
+    
+    参数：
+        canvas: PIL Image对象
+        stripe_height_cm: 条纹区域的高度（厘米）
+        dpi: 分辨率
+        bottom_margin_cm: 底部留白高度（厘米），默认0
+        stripe_width_px: 每条斜纹的宽度（像素），默认30
+        stripe_color: 斜纹颜色，默认黑色
+        bg_color: 背景颜色，默认白色
+    
+    返回：
+        修改后的canvas
+    """
+    canvas_w, canvas_h = canvas.size
+    draw = ImageDraw.Draw(canvas)
+    
+    # 计算条纹区域高度（像素）
+    stripe_h_px = int(stripe_height_cm * dpi)
+    bottom_margin_px = int(bottom_margin_cm * dpi)
+    stripe_y_start = canvas_h - stripe_h_px - bottom_margin_px
+    stripe_y_end = canvas_h - bottom_margin_px
+    
+    # 先绘制背景色
+    draw.rectangle([0, stripe_y_start, canvas_w, stripe_y_end], fill=bg_color)
+    
+    # 绘制斜纹：从左到右，每个斜纹从左下到右上
+    # 斜纹角度约45度
+    stripe_offset = int(stripe_width_px * 1.5)  # 每条斜纹的间距（一黑一白）
+    
+    # 计算需要多少条斜纹（覆盖整个宽度+高度对角线）
+    num_stripes = (canvas_w + stripe_h_px) // stripe_offset + 2
+    
+    for i in range(num_stripes):
+        # 计算斜纹起始x坐标
+        start_x = i * stripe_offset - stripe_h_px
+        
+        # 绘制斜纹：一个平行四边形
+        # 左下、右下、右上、左上四个点
+        points = [
+            (start_x, stripe_y_end),                           # 左下
+            (start_x + stripe_width_px, stripe_y_end),         # 右下
+            (start_x + stripe_width_px + stripe_h_px, stripe_y_start),  # 右上
+            (start_x + stripe_h_px, stripe_y_start)        # 左上
+        ]
+        draw.polygon(points, fill=stripe_color)
+    
+    return canvas
