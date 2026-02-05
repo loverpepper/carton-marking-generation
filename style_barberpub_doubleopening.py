@@ -164,9 +164,9 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         font_path_droid = self.font_paths['Droid Sans Bold']
         
         # --- 区域 A: 左上角 Logo ---
-        margin_top_px = int(2 * sku_config.dpi)  # 顶部边距2cm
+        margin_top_px = int(3 * sku_config.dpi)  # 顶部边距3cm
         margin_left_px = int(3 * sku_config.dpi)  # 左边距3cm
-        margin_right_px = int(3 * sku_config.dpi)  # 右边距3cm
+        margin_right_px = int(2.7 * sku_config.dpi)  # 右边距2.7cm
         
         icon_logo = self.resources['icon_logo']
         icon_logo_h_px = int(canvas_h * 0.14)  # Logo高度约为画布高度的14%
@@ -185,8 +185,8 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         
         # --- 区域 C: 中间 Product 名称和标语作为整体居中（稍微缩小）---
         product_text = sku_config.product
-        target_product_w = int(canvas_w * 0.76)  # 缩小到76%宽度
-        max_product_h = int(canvas_h * 0.20)  # 缩小到20%高度
+        target_product_w = int(canvas_w * 0.63)  # 缩小到68%宽度
+        max_product_h = int(canvas_h * 0.28)  # 缩小到28%高度
         
         product_font_size = general_functions.get_max_font_size(
             product_text, font_path_droid, target_product_w, max_height=max_product_h
@@ -207,8 +207,8 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         vertical_gap = int(1.3 * sku_config.dpi)  # Product和Slogan之间间距1.3cm
         total_center_h = product_h + vertical_gap + icon_slogan_resized.height
         
-        # 整体垂直居中（在画布的45%处）
-        center_y_start = int(canvas_h * 0.45) - (total_center_h // 2)
+        # 整体垂直居中（在画布的48%处）
+        center_y_start = int(canvas_h * 0.48) - (total_center_h // 2)
         
         # 绘制Product（居中）
         product_x = (canvas_w - product_w) // 2
@@ -239,12 +239,12 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         draw = ImageDraw.Draw(canvas)  # 重新创建draw对象，因为canvas被更新了
         
         # --- 区域 E: 左下角颜色和SKU代码 ---
-        margin_bottom_px = int(3.2 * sku_config.dpi)  # 底部边距2.2cm（增大，确保文字在斜纹上方）
+        margin_bottom_px = int(3.2 * sku_config.dpi)  # 底部边距3.2cm（增大，确保文字在斜纹上方）
         text_vertical_gap = int(0.3 * sku_config.dpi)  # 文字之间的垂直间距
         
         # SKU代码文字（大字，粗体）
         sku_code_text = sku_config.sku_name
-        target_sku_code_w = int(canvas_w * 0.52)  # 宽度为面板宽度的52%
+        target_sku_code_w = int(canvas_w * 0.715)  # 宽度为面板宽度的68%
         sku_code_font_size = general_functions.get_max_font_size(
             sku_code_text, font_path_centschbook, target_sku_code_w, max_height=int(canvas_h * 0.14)
         )
@@ -256,7 +256,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         
         # SKU代码Y坐标（从底部往上算）
         sku_code_y = canvas_h - margin_bottom_px - sku_code_h - int(0.5 * sku_config.dpi)
-        sku_code_x = margin_left_px
+        sku_code_x = margin_left_px - int(0.6 * sku_config.dpi)  # 左移0.6cm以增加边距
 
         draw.text((sku_code_x, sku_code_y), sku_code_text, font=sku_code_font, fill=(0, 0, 0))
         
@@ -274,28 +274,37 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         
         # --- 区域 F: 右下角箱号信息（黑框文字）---
         box_text = f"BOX {sku_config.box_number['current_box']} OF {sku_config.box_number['total_boxes']}"
-        box_text_font_size = int(canvas_h * 0.055)  # 字体大小为画布高度的5.5%
+        box_text_font_size = int(canvas_h * 0.038)  # 字体大小为画布高度的5.5%
         box_text_font = ImageFont.truetype(font_path_centschbook, box_text_font_size)
         
         # 计算文字尺寸
         bbox_box_text = draw.textbbox((0, 0), box_text, font=box_text_font)
+        bbox_box_text_w = bbox_box_text[2] - bbox_box_text[0]
+        bbox_box_text_h = bbox_box_text[3] - bbox_box_text[1]
         
         # 箱号位置（右下角，与SKU代码Y坐标对齐）
-        box_text_pos = (canvas_w - margin_right_px - (bbox_box_text[2] - bbox_box_text[0]), sku_code_y)
+        bbox_text_x = canvas_w - margin_right_px - bbox_box_text_w
+        bbox_text_y = canvas_h - margin_bottom_px - bbox_box_text_h - int(0.5 * sku_config.dpi) 
+        box_text_pos = (bbox_text_x, bbox_text_y)
         
         # 绘制黑框背景
         draw = general_functions.draw_rounded_bg_for_text(
             draw, bbox_box_text, sku_config, box_text_pos,
-            bg_color=(0, 0, 0), padding_cm=(0.5, 0.4), radius=12
+            bg_color=(0, 0, 0), padding_cm=(0.5, 0.7), radius=12
         )
         
         # 绘制白色文字
-        draw.text(box_text_pos, box_text, font=box_text_font, fill=(255, 255, 255))
+        draw.text(box_text_pos, box_text, font=box_text_font, fill=sku_config.background_color)
         
         canvas_front = canvas
         return canvas_front
     
     def generate_barberpub_side_panel(self, sku_config):
+        """
+        生成 Barberpub 对开盖样式的侧面板
+        在这里分成了两种情况：宽侧唛和窄侧唛，根据箱子宽度决定使用哪种侧唛
+            
+        """
         canvas = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.h_px), sku_config.background_color)
         draw = ImageDraw.Draw(canvas)
         
@@ -304,21 +313,15 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         # 加载字体路径
         font_path_centschbook = self.font_paths['CentSchbook BT']
         
-        # --- 区域 A: 侧唛标签 ---
-        icon_side_label = self.resources['icon_side_label_wide'] if sku_config.w_px >= int(30 * sku_config.dpi) else self.resources['icon_side_label_narrow']
-        icon_side_label_h_px = int(canvas_h * 0.25)  # 标签高度约为画布高度的25%
-        icon_side_label_resized = general_functions.scale_by_height(icon_side_label, icon_side_label_h_px)
-        icon_side_label_x = (canvas_w - icon_side_label_resized.width) // 2
-        icon_side_label_y = int(canvas_h * 0.05)  # 顶部5%处
-        canvas.paste(icon_side_label_resized, (icon_side_label_x, icon_side_label_y), mask=icon_side_label_resized)
-        
-        # --- 区域 B: 底部线描图 ---
-        icon_line_drawing = self.resources['img_line_drawing']
-        icon_line_drawing_h_px = int(canvas_h * 0.40)  # 线描图高度约为画布高度的40%
-        icon_line_drawing_resized = general_functions.scale_by_height(icon_line_drawing, icon_line_drawing_h_px)
-        icon_line_drawing_x = (canvas_w - icon_line_drawing_resized.width) // 2
-        icon_line_drawing_y = canvas_h - icon_line_drawing_resized.height - int(canvas_h * 0.05)  # 底部5%处
-        canvas.paste(icon_line_drawing_resized, (icon_line_drawing_x, icon_line_drawing_y), mask=icon_line_drawing_resized)
+        # --- 区域 A: 侧唛网址 ---
+        """ 两种情况下都放置侧唛网址，位置和大小相同 """
+        icon_webside = self.resources['icon_webside']
+        icon_webside_w_px = int(canvas_w * 0.5)  # 宽度为画布宽度的50%
+        icon_webside_resized = general_functions.scale_by_width(icon_webside, icon_webside_w_px)
+        icon_webside_x = (canvas_w - icon_webside_resized.width) // 2
+        icon_webside_y = int(3 * sku_config.dpi)  # 顶部边距3cm
+        canvas.paste(icon_webside_resized, (icon_webside_x, icon_webside_y), mask=icon_webside_resized)
+
         
         canvas_side = canvas
         return canvas_side

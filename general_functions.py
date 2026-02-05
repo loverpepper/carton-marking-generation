@@ -68,8 +68,8 @@ def draw_rounded_bg_for_text(draw, bbox, sku_config, color_xy,
     px_padding_y = int(padding_cm[1] * sku_config.dpi) #上下内边距 padding_cm[1]
     
     # 调整上下边距比例，使视觉上更平衡
-    px_padding_y_top = int(px_padding_y * 0.8 )    # 上边距增加30%
-    px_padding_y_bottom = int(px_padding_y * 1.3 ) # 下边距减少30%
+    px_padding_y_top = int(px_padding_y * 0.7 )    # 上边距增加30%
+    px_padding_y_bottom = int(px_padding_y * 1.4 ) # 下边距减少30%
     
     # 3. 计算黑框整体尺寸
     rect_w = text_w + 2 * px_padding_x
