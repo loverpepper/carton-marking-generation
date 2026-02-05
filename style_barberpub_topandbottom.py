@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-MCombo 标准样式 - 将原有的 BoxMarkEngine 转换为样式类
+Barberpub 天地盖样式 - 将原有的 BoxMarkEngine 转换为样式类
 """
 from PIL import Image, ImageDraw, ImageFont
 import pathlib as Path
@@ -60,7 +60,7 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
         }
         
     def generate_all_panels(self, sku_config):
-        """生成 MCombo 天地盖样式需要的所有面板"""
+        """生成 Barberpub 天地盖样式需要的所有面板"""
         
         canvas_front_side, canvas_back_side = self.generate_barberpub_front_and_back_side(sku_config)
         canvas_left_side, canvas_right_side = self.generate_barberpub_left_and_right_side(sku_config)
@@ -75,8 +75,8 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
         }
     
     def _load_resources(self):
-        """加载 MCombo 天地盖样式的图片资源"""
-        res_base = self.base_dir / 'assets' / 'Barberpub' / '样式一' / '矢量文件'
+        """加载 Barberpub 天地盖样式的图片资源"""
+        res_base = self.base_dir / 'assets' / 'Barberpub' / '天地盖' / '矢量文件'
         
         self.resources = {
             'icon_logo': Image.open(res_base / '正唛logo.png').convert('RGBA'),
@@ -89,7 +89,7 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
     
     def _load_fonts(self):
         """加载字体路径"""
-        font_base = self.base_dir / 'assets' / 'Barberpub' / '样式一' / '箱唛字体'
+        font_base = self.base_dir / 'assets' / 'Barberpub' / '天地盖' / '箱唛字体'
         self.font_paths = {
             'CentSchbook BT': str(font_base / '111.ttf'),
             'Droid Sans Bold': str(font_base / 'CENSBKBI.ttf'),

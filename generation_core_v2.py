@@ -9,6 +9,7 @@ from style_base import StyleRegistry
 # 导入所有样式模块以自动注册
 import style_mcombo_standard
 import style_barberpub_topandbottom
+import style_barberpub_doubleopening
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -141,9 +142,9 @@ def visualize_layout(sku_config, generator):
 if __name__ == "__main__":
     # 使用新框架生成箱唛
     sku_text = {
-        'gw_value': 66.2,
-        'nw_value': 95.9,
-        'sn_code': '08429383723953',
+        'gw_value': 71.0,
+        'nw_value': 57.9,
+        'sn_code': '08429381123115',
         'origin_text':'MADE IN CHINA',
     }
 
@@ -154,15 +155,15 @@ if __name__ == "__main__":
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6154-2098W",
-        length_cm=71,
-        width_cm=45,
-        height_cm=30,
-        style_name="barberpub_topandbottom",  # 指定样式
+        sku_name="6154-CZ-2933BK-1",
+        length_cm=67.5,
+        width_cm=67.5,
+        height_cm=44,
+        style_name="barberpub_doubleopening",  # 指定样式
         ppi=150,
 
-        color='WHITE',
-        product='Salon Trolley',
+        color='(CREAM WHITE)',
+        product='Vintage Barber Chair',
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
@@ -171,7 +172,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_topandbottom", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_doubleopening", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
