@@ -19,7 +19,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         return "Barberpub 对开盖箱唛样式 - 带公司Logo、SKU信息、条形码"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'color', 'origin', 'product', 'side_text', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'box_number']
     
     def get_layout_config(self, sku_config):
         '''
@@ -120,6 +120,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             'Calibri Bold': str(font_base / 'calibri_blod.TTF'),
 
         }
+
     
     def generate_barberpub_left_panel(self, sku_config):
         """生成 Barberpub 对开盖样式的左侧面板"""
@@ -244,7 +245,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         
         # SKU代码文字（大字，粗体）
         sku_code_text = sku_config.sku_name
-        target_sku_code_w = int(canvas_w * 0.715)  # 宽度为面板宽度的68%
+        target_sku_code_w = int(canvas_w * 0.715)  # 宽度为面板宽度的71.5%
         sku_code_font_size = general_functions.get_max_font_size(
             sku_code_text, font_path_centschbook, target_sku_code_w, max_height=int(canvas_h * 0.14)
         )
@@ -274,7 +275,10 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         
         # --- 区域 F: 右下角箱号信息（黑框文字）---
         box_text = f"BOX {sku_config.box_number['current_box']} OF {sku_config.box_number['total_boxes']}"
-        box_text_font_size = int(canvas_h * 0.038)  # 字体大小为画布高度的5.5%
+        box_text_font_w = int(canvas_w * 0.127)  # 目标宽度为画布宽度的12.7%
+        box_text_font_h = int(canvas_h * 0.038)  # 字体大小为画布高度的3.8%
+        box_text_font_size = general_functions.get_max_font_size(
+            box_text, font_path_centschbook, box_text_font_w, max_height=box_text_font_h)
         box_text_font = ImageFont.truetype(font_path_centschbook, box_text_font_size)
         
         # 计算文字尺寸
@@ -322,6 +326,512 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         icon_webside_y = int(3 * sku_config.dpi)  # 顶部边距3cm
         canvas.paste(icon_webside_resized, (icon_webside_x, icon_webside_y), mask=icon_webside_resized)
 
+        if sku_config.w_cm > sku_config.h_cm :
+            """
+            【宽侧唛的设计标准】对开盖侧唛分为两种：当侧唛的高小于等于宽10cm时，侧唛为左右结构，即分割条在底部。
+            """
+            
+            # --- 区域 A: 底部斜纹条块（先绘制，避免遮盖文字）---
+            stripe_height_cm = 1.2
+            bottom_margin_cm = 0.6
+            
+            canvas = general_functions.draw_diagonal_stripes(
+                canvas, 
+                stripe_height_cm=stripe_height_cm,
+                dpi=sku_config.dpi,
+                bottom_margin_cm=bottom_margin_cm,
+                stripe_width_px=150,
+                stripe_color=(0, 0, 0),
+                bg_color=sku_config.background_color
+            )
+            draw = ImageDraw.Draw(canvas)  # 重新创建draw对象，因为canvas被更新了
+            
+            # --- 区域 B: 线描图 (居左，高度为侧唛 2/3) ---
+            img_line_drawing = self.resources['img_line_drawing']
+            line_h = int(canvas_h * 0.66) # 侧唛的三分之二
+            img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)
+            # 居左粘贴，留出 margin
+            img_line_drawing_x = int(5 * sku_config.dpi)  # 左边距5cm
+            img_line_drawing_y = (canvas_h - line_h) // 2 + int( 0.05 * sku_config.h_px) # 纵向微调，稍微下移0.05倍高度
+            canvas.paste(img_line_resized, (img_line_drawing_x, img_line_drawing_y), mask=img_line_resized)
+            
+            # --- 区域 C: 右侧 SKU 文字 ---
+            sku_text = sku_config.sku_name
+            # 放在右侧中间偏上
+            sku_font_size_w = int(canvas_w * 0.571)  # 字体大小为画布宽度的57.1%
+            sku_font_size = general_functions.get_max_font_size(
+                sku_text, font_path_centschbook, target_width = sku_font_size_w, max_height=int(canvas_h * 0.11)
+            )
+            sku_font = ImageFont.truetype(font_path_centschbook, sku_font_size)
+            sku_box = draw.textbbox((0,0), sku_text, font=sku_font)
+            bbox_sku_w = sku_box[2] - sku_box[0]
+            bbox_sku_h = sku_box[3] - sku_box[1]
+            bbox_sku_x = int(canvas_w * 0.38) # 右侧偏左一些
+            bbox_sku_y = int(canvas_h * 0.38) # 纵向偏上一些
+            draw.text((bbox_sku_x, bbox_sku_y), sku_text, font=sku_font, fill=(0,0,0))
+            
+            # --- 区域 D: 中间右侧颜色信息 ---
+            color_text = f"{sku_config.color.upper()}"
+            # 放在右侧中间,在箱号信息的后边
+            color_font_h = int(canvas_h * 0.041)  # 字体大小为画布高度的3.8%
+            color_font = ImageFont.truetype(font_path_centschbook, color_font_h)
+            bbox_color = draw.textbbox((0,0), color_text, font=color_font)
+            bbox_color_w = bbox_color[2] - bbox_color[0]
+            bbox_color_h = bbox_color[3] - bbox_color[1]
+            bbox_color_x = bbox_sku_x + bbox_sku_w - bbox_color_w - int(0.3 * sku_config.dpi) # 王回收1cm
+            bbox_color_y = bbox_sku_y + bbox_sku_h + int(2.6 * sku_config.dpi) # 纵向间距2cm
+            draw.text((bbox_color_x, bbox_color_y), color_text, font=color_font, fill=(0,0,0))
+            
+            # --- 区域 E: 中间右侧箱号信息（黑框文字）---
+            box_text = f"BOX {sku_config.box_number['current_box']} OF {sku_config.box_number['total_boxes']}"
+            box_text_font_h = int(canvas_h * 0.038)  # 字体大小为画布高度的3.8%
+            box_text_font_w = int(canvas_w * 0.127)  # 目标宽度为画布宽度的12.7%
+            box_text_font_size = general_functions.get_max_font_size(
+                box_text, font_path_centschbook, box_text_font_w, max_height=box_text_font_h)
+            box_text_font = ImageFont.truetype(font_path_centschbook, box_text_font_size)
+            
+            # 计算文字尺寸
+            bbox_box_text = draw.textbbox((0, 0), box_text, font=box_text_font)
+            bbox_box_text_w = bbox_box_text[2] - bbox_box_text[0]
+            bbox_box_text_h = bbox_box_text[3] - bbox_box_text[1]
+            
+            # 箱号位置（SKU代码的下方）
+            bbox_text_x = bbox_color_x - bbox_box_text_w  - int( 1.5 * sku_config.dpi) # 左移2cm
+            bbox_text_y = bbox_sku_y + bbox_sku_h + int(2.6 * sku_config.dpi)  + int( (bbox_color_h - bbox_box_text_h ) / 3) # 纵向间距3cm
+            box_text_pos = (bbox_text_x, bbox_text_y)
+            
+            # 绘制黑框背景
+            draw = general_functions.draw_rounded_bg_for_text(
+                draw, bbox_box_text, sku_config, box_text_pos,
+                bg_color=(0, 0, 0), padding_cm=(0.5, 0.7), radius=12
+            )
+            
+            # 绘制白色文字
+            draw.text(box_text_pos, box_text, font=box_text_font, fill=sku_config.background_color)
+            
+            # --- 区域 F: 右下侧标签框---
+            # 使用宽侧唛
+            icon_side_label = self.resources['icon_side_label_wide']
+            
+            # 调整标签大小
+            label_w_target = int(bbox_sku_w * 0.93)  # 标签宽度为SKU文字的93%
+            
+            # 填充标签内容
+            icon_side_label_filled = self.fill_side_wide_label_barberpub_doubleopening(sku_config, icon_side_label, self.font_paths)
+            icon_side_label_filled_resized = general_functions.scale_by_width(icon_side_label_filled, label_w_target)
+            
+            # 标签位置（底部中央，斜纹条上方）
+            label_x = bbox_sku_x + int(bbox_sku_w * 0.07)
+            label_y = bbox_text_y + bbox_box_text_h + int( canvas_h * 0.14)  
+            canvas.paste(icon_side_label_filled_resized, (label_x, label_y), icon_side_label_filled_resized)
+            
+
+        else:
+            """
+            【窄侧唛的设计标准】对开盖侧唛分为两种：当侧唛的高大于等于宽10cm，侧唛为上下结构，即分割条在尺寸重量标签之上，
+            """
+            
+            # --- 区域 B: 线描图（在网址下方间隔3cm，高度为canvas_h的46%）---
+            img_line_drawing = self.resources['img_line_drawing']
+            line_h = int(canvas_h * 0.46)  # 高度为画布高度的46%
+            img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)
+            
+            # 线描图位置（网址下方间隔3cm，水平居中）
+            img_line_x = (canvas_w - img_line_resized.width) // 2
+            img_line_y = icon_webside_y + icon_webside_resized.height + int(3 * sku_config.dpi)  # 间隔3cm
+            canvas.paste(img_line_resized, (img_line_x, img_line_y), mask=img_line_resized)
+            
+            # --- 区域 C: SKU文字（在线描图下方间隔3cm）---
+            sku_text = sku_config.sku_name
+            
+            # SKU文字位置（线描图下方间隔3cm）
+            sku_text_y = img_line_y + img_line_resized.height + int(3 * sku_config.dpi)  # 间隔3cm
+            
+            # 最大字号：画布宽度的90%
+            max_sku_w = int(canvas_w * 0.9)
+            max_sku_h = int(canvas_h * 0.12)  # 限制高度为画布高度的12%
+            
+            sku_font_size = general_functions.get_max_font_size(
+                sku_text, font_path_centschbook, max_sku_w, max_height=max_sku_h
+            )
+            sku_font = ImageFont.truetype(font_path_centschbook, sku_font_size)
+            
+            # 计算SKU文字宽度并居中
+            sku_text_w = draw.textlength(sku_text, font=sku_font)
+            sku_text_x = (canvas_w - sku_text_w) // 2
+            draw.text((sku_text_x, sku_text_y), sku_text, font=sku_font, fill=(0, 0, 0))
+            
+            # --- 区域 D: 斜纹条块 ---
+            stripe_height_cm = 1.2
+            # 下边界距离canvas底是canvas_h的21%
+            bottom_margin_px = int(canvas_h * 0.21)
+            bottom_margin_cm = bottom_margin_px / sku_config.dpi
+            
+            canvas = general_functions.draw_diagonal_stripes(
+                canvas, 
+                stripe_height_cm=stripe_height_cm,
+                dpi=sku_config.dpi,
+                bottom_margin_cm=bottom_margin_cm,
+                stripe_width_px=150,
+                stripe_color=(0, 0, 0),
+                bg_color=sku_config.background_color
+            )
+            draw = ImageDraw.Draw(canvas)  # 重新创建draw对象
+            canvas_w, canvas_h = canvas.size  # 更新尺寸变量
+            
+            # --- 区域 E: 侧唛标签（右下方，斜纹条块下方）---
+            icon_side_label = self.resources['icon_side_label_narrow']
+            
+            # 调整标签大小（占画布宽度的85%）
+            label_h_target = int(canvas_w * 0.15)
+            icon_side_label_resized = general_functions.scale_by_height(icon_side_label, label_h_target)
+            
+            # 填充标签内容
+            icon_side_label_filled_resized = self.fill_side_narrow_label_barberpub_doubleopening(sku_config, icon_side_label_resized, self.font_paths)
+            
+            # 标签位置（右下方，在斜纹条下方）
+            label_x = canvas_w //2 + int( (canvas_w // 2 - icon_side_label_filled_resized.width) //2 )
+            label_y = canvas_h - bottom_margin_px + int((bottom_margin_px - icon_side_label_filled_resized.height ) //2 )
+            canvas.paste(icon_side_label_filled_resized, (label_x, label_y), icon_side_label_filled_resized)
+            
+            # --- 区域 F: 净重毛重信息（左下方，斜纹条块下方）---
+            
+            # 设置左侧信息区域的起始位置
+            info_start_x = int(canvas_w * 0.0987)  # 从canvas_w的9.87%处开始
+            info_center_y = canvas_h - int(bottom_margin_px // 2)  # 斜纹条下方区域的垂直中心
+            
+            # --- 统一字体设置 ---
+            label_font_size = int(canvas_h * 0.028)  # 标签文字字号（G.W./N.W. 和 BOX SIZE）
+            value_font_size = int(canvas_h * 0.024)  # 值文字字号（比标签文字小一点）
+            label_font = ImageFont.truetype(font_path_centschbook, label_font_size)
+            value_font = ImageFont.truetype(font_path_centschbook, value_font_size)
+            
+            # 上下间隔2cm
+            vertical_gap = int(2.6 * sku_config.dpi)
+            
+            # --- G.W./N.W. 标签和值 ---
+            gw_label_text = "G.W./N.W."
+            gw_value_text = f"{sku_config.side_text['gw_value']} / {sku_config.side_text['nw_value']} LBS"
+            
+            # 计算G.W./N.W.标签的边界框
+            bbox_gw_label = draw.textbbox((0, 0), gw_label_text, font=label_font)
+            gw_label_w = bbox_gw_label[2] - bbox_gw_label[0]
+            gw_label_h = bbox_gw_label[3] - bbox_gw_label[1]
+            
+            # G.W./N.W.标签位置（上方，文字底部距虚线 vertical_gap // 2）
+            gw_label_x = info_start_x 
+            gw_label_y = info_center_y - vertical_gap // 2 - gw_label_h * 1.3 # 上移1.3倍高度以增加间距
+            gw_label_pos = (gw_label_x, gw_label_y)
+            
+            # 绘制G.W./N.W.标签黑色圆角背景
+            draw = general_functions.draw_rounded_bg_for_text(
+                draw, bbox_gw_label, sku_config, gw_label_pos,
+                bg_color=(0, 0, 0), padding_cm=(0.3, 0.7), radius=16
+            )
+            
+            # 绘制G.W./N.W.标签文字
+            draw.text(gw_label_pos, gw_label_text, font=label_font, fill=sku_config.background_color)
+            
+            # G.W./N.W.值位置（标签右边间隔2cm，文字中心与G.W./N.W.文字中心对齐）
+            gw_value_x = gw_label_x + gw_label_w + int(2 * sku_config.dpi)
+            
+            # 计算G.W./N.W.值的边界框以获取高度
+            bbox_gw_value = draw.textbbox((0, 0), gw_value_text, font=value_font)
+            gw_value_h = bbox_gw_value[3] - bbox_gw_value[1]
+            
+            # 使值文字中心与标签文字中心在同一水平线上
+            gw_label_center_y = gw_label_y + gw_label_h // 2
+            gw_value_y = gw_label_center_y - gw_value_h // 2
+            draw.text((gw_value_x, gw_value_y), gw_value_text, font=value_font, fill=(0, 0, 0))
+            
+            # --- BOX SIZE 标签和值 ---
+            box_label_text = "BOX SIZE"
+            box_value_text = f"{sku_config.l_cm:.1f}\" x {sku_config.w_cm:.1f}\" x {sku_config.h_cm:.1f}\""
+            
+            # 计算BOX SIZE标签的边界框
+            bbox_box_label = draw.textbbox((0, 0), box_label_text, font=label_font)
+            box_label_w = bbox_box_label[2] - bbox_box_label[0]
+            box_label_h = bbox_box_label[3] - bbox_box_label[1]
+            
+            # BOX SIZE标签位置（下方，文字顶部距虚线 vertical_gap // 2）
+            box_label_x = info_start_x
+            box_label_y = info_center_y + vertical_gap // 2
+            box_label_pos = (box_label_x, box_label_y)
+            
+            # 绘制BOX SIZE标签黑色圆角背景
+            draw = general_functions.draw_rounded_bg_for_text(
+                draw, bbox_box_label, sku_config, box_label_pos,
+                bg_color=(0, 0, 0), padding_cm=(0.3, 0.7), radius=16
+            )
+            # 绘制BOX SIZE标签文字
+            draw.text(box_label_pos, box_label_text, font=label_font, fill=sku_config.background_color)
+            
+            # BOX SIZE值位置（标签右边间隔2cm，文字中心与BOX SIZE文字中心对齐）
+            box_value_x = gw_value_x  # 与G.W./N.W.值对齐
+            
+            # 计算BOX SIZE值的边界框以获取高度
+            bbox_box_value = draw.textbbox((0, 0), box_value_text, font=value_font)
+            box_value_h = bbox_box_value[3] - bbox_box_value[1]
+            
+            # 使值文字中心与标签文字中心在同一水平线上
+            box_label_center_y = box_label_y + box_label_h // 2
+            box_value_y = box_label_center_y - box_value_h // 2
+            draw.text((box_value_x, box_value_y), box_value_text, font=value_font, fill=(0, 0, 0))
+            
+            # --- 绘制虚线（在G.W./N.W.和BOX SIZE之间）---
+            dash_x_start = int(canvas_w * 0.101)  # 虚线起始位置
+            dash_length = int(canvas_w * 0.44)  # 虚线长度约44%
+            dash_y = info_center_y  # 虚线Y坐标（两行文字中间）
+            
+            # 绘制虚线
+            dash_width = 10  # 每段虚线的宽度
+            dash_gap = 12  # 虚线间隔
+            current_x = dash_x_start
+            while current_x < dash_x_start + dash_length:
+                draw.line([(current_x, dash_y), (current_x + dash_width, dash_y)], fill=(0, 0, 0), width=3)
+                current_x += dash_width + dash_gap
+            
         
         canvas_side = canvas
         return canvas_side
+    
+    
+    
+
+
+
+
+
+
+
+
+
+    """
+    以下内容为填充Barberpub对开盖侧唛标签的函数
+    """
+
+
+
+    def fill_side_wide_label_barberpub_doubleopening(self, sku_config, img_label, fonts_paths):
+        """
+        填充Barberpub对开盖样式的侧唛标签
+        
+        参数:
+            sku_config: SKU配置对象
+            img_label: 空白标签图片
+            fonts_paths: 字体路径字典
+        
+        返回:
+            填充好内容的标签图片
+        """
+        # 在空白标签上绘制内容
+        label_canvas = img_label.copy()
+        draw = ImageDraw.Draw(label_canvas)
+        
+        label_w, label_h = label_canvas.size
+        font_path_centschbook = fonts_paths['CentSchbook BT']
+        
+        # --- 区域1: 重量信息 G.W./N.W. ---
+        # 假设重量信息，实际项目中应该从sku_config获取
+        gw_text = f"G.W./N.W. : {sku_config.side_text['gw_value']} / {sku_config.side_text['nw_value']} LBS"
+        gw_font_size = int(label_h * 0.182)  # 字体大小为标签高度的16.2%
+        gw_font = ImageFont.truetype(font_path_centschbook, gw_font_size)
+        
+        # 重量信息位置（顶部左侧）
+        gw_x = int(label_w * 0.023)  # 左边距2%
+        gw_y = int(label_h * 0.13)  # 顶部13%处
+        draw.text((gw_x, gw_y), gw_text, font=gw_font, fill=(0, 0, 0))
+        
+        # --- 区域2: 箱子尺寸 BOX SIZE ---
+        box_size_text = f"BOX SIZE : {sku_config.l_cm:.1f}\" x {sku_config.w_cm:.1f}\" x {sku_config.h_cm:.1f}\""
+        box_font_size = int(label_h * 0.182)  # 字体大小为标签高度的16.2%
+        box_font = ImageFont.truetype(font_path_centschbook, box_font_size)
+        
+        # 箱子尺寸位置（左侧，在重量信息下方）
+        box_x = int(label_w * 0.023)  # 左边距2%
+        box_y = int(label_h * 0.48)  # 48%处
+        draw.text((box_x, box_y), box_size_text, font=box_font, fill=(0, 0, 0))
+        
+        # --- 区域3: 两个条形码区域 ---
+        
+        barcode_area_y = int(label_h * 0.05)
+        barcode_area_h = int(label_h * 0.26)
+        
+        # 第一个条形码：使用SKU名称生成
+        barcode1_text = sku_config.sku_name
+        try:
+            # 生成第一个条形码图片
+            barcode1_img = general_functions.generate_barcode_image(
+                barcode1_text, 
+                int(label_w * 0.25),  # 条形码宽度为标签宽度的25%
+                barcode_area_h   
+            )
+            
+            # 第一个条形码位置（右上角）
+            barcode1_x = int(label_w * 0.598)
+            barcode1_y = barcode_area_y
+            label_canvas.paste(barcode1_img, (barcode1_x, barcode1_y), barcode1_img if barcode1_img.mode == 'RGBA' else None)
+            
+            # 第一个条形码下方的编号
+            number1_text = barcode1_text
+            number1_font_size = int(label_h * 0.04)
+            number1_font = ImageFont.truetype(font_path_centschbook, number1_font_size)
+            bbox_number1 = draw.textbbox((0, 0), number1_text, font=number1_font)
+            number1_x = barcode1_x + int( (barcode1_img.width - (bbox_number1[2] - bbox_number1[0])) / 2 )
+            number1_y = barcode1_y + barcode1_img.height + int(label_h * 0.004)
+            draw.text((number1_x, number1_y), number1_text, font=number1_font, fill=(0, 0, 0))
+            
+        except Exception as e:
+            # 如果第一个条形码生成失败，只显示文字
+            draw.text((int(label_w * 0.51), barcode_area_y), barcode1_text, 
+                    font=ImageFont.truetype(font_path_centschbook, int(label_h * 0.05)), fill=(0, 0, 0))
+        
+        # 第二个条形码：使用sn_code生成
+        barcode2_text = sku_config.side_text['sn_code']
+        try:
+            # 生成第二个条形码图片
+            barcode2_img = general_functions.generate_barcode_image(
+                barcode2_text, 
+                int(label_w * 0.14),  # 条形码宽度为标签宽度的14%
+                barcode_area_h   
+            )
+            
+            # 第二个条形码位置（右边第二个）
+            barcode2_x = int(label_w * 0.855)
+            barcode2_y = barcode_area_y
+            label_canvas.paste(barcode2_img, (barcode2_x, barcode2_y), barcode2_img if barcode2_img.mode == 'RGBA' else None)
+            
+            # 第二个条形码下方的编号
+            number2_font_size = int(label_h * 0.04)
+            number2_font = ImageFont.truetype(font_path_centschbook, number2_font_size)
+            bbox_number2 = draw.textbbox((0, 0), barcode2_text, font=number2_font)
+            number2_x = barcode2_x + int( (barcode2_img.width - (bbox_number2[2] - bbox_number2[0])) / 2 )
+            number2_y = barcode2_y + barcode2_img.height + int(label_h * 0.004)
+            draw.text((number2_x, number2_y), barcode2_text, font=number2_font, fill=(0, 0, 0))
+            
+        except Exception as e:
+            # 如果第二个条形码生成失败，只显示文字
+            draw.text((int(label_w * 0.82), int(label_h * 0.1)), barcode2_text, 
+                    font=ImageFont.truetype(font_path_centschbook, int(label_h * 0.05)), fill=(0, 0, 0))
+        
+        # --- 区域4: 右侧物流图标区域 ---
+        # 这里放置物流图标（雨伞、易碎品等标识）
+
+        
+        # 可以在这里添加各种物流图标的绘制代码
+        # 目前先留空，等待具体的图标资源
+        
+        # --- 区域5: 底部产地信息条 ---
+        china_bar_y = int(label_h * 0.78)
+        china_bar_height = int(label_h * 0.18)
+        draw.rectangle([(0, china_bar_y), (label_w, china_bar_y + china_bar_height)], fill=(0, 0, 0))
+        
+        # 产地文字（使用背景色作为文字颜色）
+        origin_text = sku_config.side_text.get('origin_text', 'MADE IN CHINA')
+        china_font_size = int(label_h * 0.098)
+        china_font = ImageFont.truetype(font_path_centschbook, china_font_size)
+        china_text_w = draw.textlength(origin_text, font=china_font)
+        china_x = (label_w - china_text_w) // 2
+        china_y = china_bar_y + int(china_bar_height * 0.27)
+        draw.text((china_x, china_y), origin_text, font=china_font, fill=sku_config.background_color)
+        
+        return label_canvas
+
+    def fill_side_narrow_label_barberpub_doubleopening(self, sku_config, img_label, fonts_paths):
+        """
+        填充Barberpub对开盖样式的窄侧唛标签
+        
+        参数:
+            sku_config: SKU配置对象
+            img_label: 空白标签图片
+            fonts_paths: 字体路径字典
+        
+        返回:
+            填充好内容的标签图片
+        """
+        # 在空白标签上绘制内容
+        label_canvas = img_label.copy()
+        draw = ImageDraw.Draw(label_canvas)
+        
+        label_w, label_h = label_canvas.size
+        font_path_centschbook = fonts_paths['CentSchbook BT']
+        
+        
+        # --- 统一设置条形码参数 ---
+
+        barcode_h = int(label_h * 0.28)  # 统一设置条形码高度
+        barcode_y = int(label_h * 0.04)  # 统一设置条形码y坐标
+
+        
+        # --- 区域1: 左侧条形码（使用SKU名称）---
+        barcode1_text = sku_config.sku_name
+        barcode1_w = int(label_w * 0.533)  # 宽度为标签宽度的53.3%
+        barcode1_h = barcode_h  
+        
+        try:
+            barcode1_img = general_functions.generate_barcode_image(barcode1_text, barcode1_w, barcode1_h)
+            barcode1_x = int(label_w * 0.05)  # 左边距5%
+            barcode1_y = barcode_y  # 统一设置条形码y坐标
+            label_canvas.paste(barcode1_img, (barcode1_x, barcode1_y), barcode1_img if barcode1_img.mode == 'RGBA' else None)
+            
+            # 条形码下方文字
+            barcode1_font_size = int(label_h * 0.04)
+            barcode1_font = ImageFont.truetype(font_path_centschbook, barcode1_font_size)
+            bbox_barcode1 = draw.textbbox((0, 0), barcode1_text, font=barcode1_font)
+            barcode1_text_x = barcode1_x + int((barcode1_w - (bbox_barcode1[2] - bbox_barcode1[0])) / 2)
+            barcode1_text_y = barcode1_y + barcode1_h + int(label_h * 0.0020)
+            draw.text((barcode1_text_x, barcode1_text_y), barcode1_text, font=barcode1_font, fill=(0, 0, 0))
+            
+        except Exception as e:
+            # 条形码生成失败时显示文字
+            draw.text((int(label_w * 0.05), barcode_y - int(1.5 * sku_config.dpi)), 
+                    barcode1_text, 
+                    font=ImageFont.truetype(font_path_centschbook, int(label_h * 0.05)), 
+                    fill=(0, 0, 0))
+        
+        # --- 区域2: 右侧条形码（使用sn_code）---
+        # --- 区域2: 右侧条形码（使用sn_code）---
+        barcode2_text = sku_config.side_text['sn_code']
+        barcode2_w = int(label_w * 0.36)  # 宽度为标签宽度的37%
+        barcode2_h = barcode_h  
+        
+        try:
+            barcode2_img = general_functions.generate_barcode_image(barcode2_text, barcode2_w, barcode2_h)
+            barcode2_x = label_w - barcode2_w - int(label_w * 0.04)  # 右边距5%
+            barcode2_y = barcode_y  # 统一设置条形码y坐标
+            label_canvas.paste(barcode2_img, (barcode2_x, barcode2_y), barcode2_img if barcode2_img.mode == 'RGBA' else None)
+            
+            # 条形码下方文字
+            barcode2_font_size = int(label_h * 0.04)
+            barcode2_font = ImageFont.truetype(font_path_centschbook, barcode2_font_size)
+            bbox_barcode2 = draw.textbbox((0, 0), barcode2_text, font=barcode2_font)
+            barcode2_text_x = barcode2_x + int((barcode2_w - (bbox_barcode2[2] - bbox_barcode2[0])) / 2)
+            barcode2_text_y = barcode2_y + barcode2_h + int(label_h * 0.0020)
+            draw.text((barcode2_text_x, barcode2_text_y), barcode2_text, font=barcode2_font, fill=(0, 0, 0))
+            
+        except Exception as e:
+            # 条形码生成失败时显示文字
+            draw.text((label_w - int(label_w * 0.25), barcode_y - int(1.5 * sku_config.dpi)), 
+                    barcode2_text, 
+                    font=ImageFont.truetype(font_path_centschbook, int(label_h * 0.05)), 
+                    fill=(0, 0, 0))
+        
+        # --- 区域3: 底部产地信息条 ---
+        
+        stripe_bottom_margin = int(label_h * 0.12)
+        
+        stripe_top_y = label_h - stripe_bottom_margin
+        china_bar_y = stripe_top_y
+        china_bar_height = stripe_bottom_margin
+        draw.rectangle([(0, china_bar_y), (label_w, label_h)], fill=(0, 0, 0))
+        
+        # 产地文字（使用背景色作为文字颜色）
+        origin_text = sku_config.side_text.get('origin_text', 'MADE IN CHINA')
+        china_font_size = int(china_bar_height * 0.5)
+        china_font = ImageFont.truetype(font_path_centschbook, china_font_size)
+        china_text_w = draw.textlength(origin_text, font=china_font)
+        china_x = (label_w - china_text_w) // 2
+        china_y = china_bar_y + int(china_bar_height * 0.20)
+        draw.text((china_x, china_y), origin_text, font=china_font, fill=sku_config.background_color)
+        
+        return label_canvas

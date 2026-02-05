@@ -155,10 +155,10 @@ if __name__ == "__main__":
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6154-CZ-2933BK-1",
-        length_cm=67.5,
-        width_cm=67.5,
-        height_cm=44,
+        sku_name="6153-SF9908BK-1",
+        length_cm=78,
+        width_cm=59,
+        height_cm=61,
         style_name="barberpub_doubleopening",  # 指定样式
         ppi=150,
 

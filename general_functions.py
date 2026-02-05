@@ -483,7 +483,7 @@ def generate_barcode_with_text(code_str, width, height):
     return img.resize((width, height), Image.LANCZOS)
 
 
-def get_max_font_size(text, font_path, target_width, max_height=None, min_size=10, max_size=500):
+def get_max_font_size(text, font_path, target_width, max_height=None, min_size=10, max_size=1000):
     """
     动态寻找能让文字适应目标宽度的最大字号
     
@@ -544,7 +544,7 @@ def fill_left_and_right_label_barberpub_topandbottom(sku_config, img_label_resiz
     # ========== 顶部条形码区域（约35%高度）==========
     barcode_zone_h = int(th * 0.35)
     
-    # 纯条形码高度（不含文字）：占条形码区域的85%（增大）
+    # 纯条形码高度（不含文字）：占条形码区域的89%（增大）
     barcode_only_h = int(barcode_zone_h * 0.89)
     # 条形码顶部间距：10% 
     barcode_y = int(barcode_zone_h * 0.10)
