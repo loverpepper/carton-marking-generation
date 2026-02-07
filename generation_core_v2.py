@@ -10,6 +10,7 @@ from style_base import StyleRegistry
 import style_mcombo_standard
 import style_barberpub_topandbottom
 import style_barberpub_doubleopening
+import style_barberpub_fulloverlap
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -142,28 +143,28 @@ def visualize_layout(sku_config, generator):
 if __name__ == "__main__":
     # 使用新框架生成箱唛
     sku_text = {
-        'gw_value': 71.0,
-        'nw_value': 57.9,
-        'sn_code': '08429381123115',
+        'gw_value': 30.9,
+        'nw_value': 24.7,
+        'sn_code': '09429381135347',
         'origin_text':'MADE IN CHINA',
     }
 
     box_number = {
-        'total_boxes': 1,
-        'current_box': 1
+        'total_boxes': 3,
+        'current_box': 2
     }
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6153-SF9908BK-1",
-        length_cm=78,
-        width_cm=59,
-        height_cm=61,
-        style_name="barberpub_doubleopening",  # 指定样式
+        sku_name="6153-SF9908CW-2",
+        length_cm=86,
+        width_cm=27,
+        height_cm=76,
+        style_name="barberpub_fulloverlap",  # 指定样式
         ppi=150,
 
         color='(CREAM WHITE)',
-        product='Vintage Barber Chair',
+        product='Electric Beauty SPA Chair',
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_doubleopening", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_fulloverlap", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
