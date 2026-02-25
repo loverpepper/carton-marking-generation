@@ -30,6 +30,18 @@ class Element(ABC):
         pass
 
 
+# 占位组件（隐形砖块，用于撑开间距或缩进对齐）
+class Spacer(Element):
+    def __init__(self, width=0, height=0):
+        super().__init__(width=width, height=height)
+
+    def layout(self, x, y, max_width=0):
+        return super().layout(x, y, max_width)
+
+    def render(self, draw: ImageDraw.ImageDraw):
+        pass  # 不画任何东西
+
+
 # 文本组件
 class Text(Element):
     def __init__(self, text, font, color = (0, 0, 0), padding = 0, nudge_x=0, nudge_y=0, draw_background=False, background_color=(0, 0, 0), border_radius = 16):
