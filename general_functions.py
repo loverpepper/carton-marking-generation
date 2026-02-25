@@ -54,6 +54,44 @@ def scale_by_width(image, target_width):
     target_height = int(h * (target_width / w))
     return image.resize((target_width, target_height), Image.Resampling.LANCZOS)
 
+def paste_image_center_with_heightorwidth(canvas, icon, height=None, width=None):
+    """ 推荐使用 """
+    
+    """
+    将 icon 缩放后居中粘贴到 canvas 上。
+    height 和 width 均为像素值，至少传入其中一个：
+      - 只传 height：按高度缩放，宽度等比例自动计算
+      - 只传 width ：按宽度缩放，高度等比例自动计算
+      - 两者都传  ：同时满足两个约束，取缩放比例较小的那个（即等比例缩放到能装入指定框中）
+    """
+    if height is None and width is None:
+        raise ValueError("height 和 width 至少需要传入一个")
+
+    orig_w, orig_h = icon.size
+
+    if height is not None and width is not None:
+        # 取两个方向比例中较小的，保证图片完整装入指定框
+        ratio = min(width / orig_w, height / orig_h)
+    elif height is not None:
+        ratio = height / orig_h
+    else:
+        ratio = width / orig_w
+
+    new_w = int(orig_w * ratio)
+    new_h = int(orig_h * ratio)
+    icon_resized = icon.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+    canvas_w, canvas_h = canvas.size
+    paste_x = (canvas_w - new_w) // 2
+    paste_y = (canvas_h - new_h) // 2
+
+    if icon_resized.mode == 'RGBA':
+        canvas.paste(icon_resized, (paste_x, paste_y), mask=icon_resized)
+    else:
+        canvas.paste(icon_resized, (paste_x, paste_y))
+
+    return canvas
+
 def draw_rounded_bg_for_text(draw, bbox, sku_config, color_xy,
                              bg_color=(0, 0, 0), padding_cm=(0.8, 0.3), radius=15):
     """

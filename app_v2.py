@@ -8,7 +8,7 @@ import pathlib as Path
 import io
 
 # 导入新版生成核心
-from generation_core_v2 import SKUConfig, BoxMarkGenerator
+from generation_core_v3 import SKUConfig, BoxMarkGenerator
 
 # 导入所有样式以自动注册
 import style_mcombo_standard
