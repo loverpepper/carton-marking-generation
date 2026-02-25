@@ -54,6 +54,44 @@ def scale_by_width(image, target_width):
     target_height = int(h * (target_width / w))
     return image.resize((target_width, target_height), Image.Resampling.LANCZOS)
 
+def paste_image_center_with_heightorwidth(canvas, icon, height=None, width=None):
+    """ 推荐使用 """
+    
+    """
+    将 icon 缩放后居中粘贴到 canvas 上。
+    height 和 width 均为像素值，至少传入其中一个：
+      - 只传 height：按高度缩放，宽度等比例自动计算
+      - 只传 width ：按宽度缩放，高度等比例自动计算
+      - 两者都传  ：同时满足两个约束，取缩放比例较小的那个（即等比例缩放到能装入指定框中）
+    """
+    if height is None and width is None:
+        raise ValueError("height 和 width 至少需要传入一个")
+
+    orig_w, orig_h = icon.size
+
+    if height is not None and width is not None:
+        # 取两个方向比例中较小的，保证图片完整装入指定框
+        ratio = min(width / orig_w, height / orig_h)
+    elif height is not None:
+        ratio = height / orig_h
+    else:
+        ratio = width / orig_w
+
+    new_w = int(orig_w * ratio)
+    new_h = int(orig_h * ratio)
+    icon_resized = icon.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+    canvas_w, canvas_h = canvas.size
+    paste_x = (canvas_w - new_w) // 2
+    paste_y = (canvas_h - new_h) // 2
+
+    if icon_resized.mode == 'RGBA':
+        canvas.paste(icon_resized, (paste_x, paste_y), mask=icon_resized)
+    else:
+        canvas.paste(icon_resized, (paste_x, paste_y))
+
+    return canvas
+
 def draw_rounded_bg_for_text(draw, bbox, sku_config, color_xy,
                              bg_color=(0, 0, 0), padding_cm=(0.8, 0.3), radius=15):
     """
@@ -528,62 +566,7 @@ def get_max_font_size(text, font_path, target_width, max_height=None, min_size=1
     
     return best_size
     
-def fill_left_and_right_label_barberpub_topandbottom(sku_config, img_label_resized, fonts_paths):
-    """
-    填充 Barberpub 天地盖样式左右侧面板的标签区域
-    
-    功能：只填充顶部的两个条形码（SKU + SN码），底部4个运输标识图片自带
-    使用 generate_barcode_image 生成纯条形码，然后手动绘制文字
-    """
-    tw, th = img_label_resized.size
-    draw = ImageDraw.Draw(img_label_resized)
-    
-    # 加载字体
-    font_path = fonts_paths['CentSchbook BT']
-    
-    # ========== 顶部条形码区域（约35%高度）==========
-    barcode_zone_h = int(th * 0.35)
-    
-    # 纯条形码高度（不含文字）：占条形码区域的89%（增大）
-    barcode_only_h = int(barcode_zone_h * 0.89)
-    # 条形码顶部间距：10% 
-    barcode_y = int(barcode_zone_h * 0.10)
-    
-    # 文字高度：占条形码区域的22%（增大）
-    text_font_size = int(barcode_zone_h * 0.22)
-    text_font = ImageFont.truetype(font_path, text_font_size)
-    # 文字位置：条形码下方，留出2%的小间距，让文字更靠近底部
-    text_y = barcode_y + barcode_only_h + int(barcode_zone_h * 0.01)
-    
-    # ========== 左侧 SKU 条形码（占宽度的52%，比SN更宽）==========
-    sku_name = sku_config.sku_name
-    sku_barcode_w = int(tw * 0.52)
-    sku_barcode_x = int(tw * 0.01)  # 左边距1%
-    
-    # 生成纯条形码（不带文字）
-    sku_barcode_img = generate_barcode_image(sku_name, width=sku_barcode_w, height=barcode_only_h)
-    img_label_resized.paste(sku_barcode_img, (sku_barcode_x, barcode_y), mask=sku_barcode_img)
-    
-    # 在条形码下方居中绘制文字
-    sku_text_w = draw.textlength(sku_name, font=text_font)
-    sku_text_x = sku_barcode_x + (sku_barcode_w - sku_text_w) // 2
-    draw.text((sku_text_x, text_y), sku_name, font=text_font, fill=(0, 0, 0))
-    
-    # ========== 右侧 SN 条形码（占宽度的42%）==========
-    sn_code = sku_config.side_text['sn_code']
-    sn_barcode_w = int(tw * 0.42)
-    sn_barcode_x = int(tw * 0.56)  # 从56%位置开始（留4%间距）
-    
-    # 生成纯条形码（不带文字）
-    sn_barcode_img = generate_barcode_image(sn_code, width=sn_barcode_w, height=barcode_only_h)
-    img_label_resized.paste(sn_barcode_img, (sn_barcode_x, barcode_y), mask=sn_barcode_img)
-    
-    # 在条形码下方居中绘制文字
-    sn_text_w = draw.textlength(sn_code, font=text_font)
-    sn_text_x = sn_barcode_x + (sn_barcode_w - sn_text_w) // 2
-    draw.text((sn_text_x, text_y), sn_code, font=text_font, fill=(0, 0, 0))
-    
-    return img_label_resized
+
 
 def draw_diagonal_stripes(canvas, stripe_height_cm, dpi, bottom_margin_cm=0, stripe_width_px=30, stripe_color=(0, 0, 0), bg_color=(255, 255, 255)):
     """

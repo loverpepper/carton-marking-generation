@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 import pathlib as Path
 from style_base import BoxMarkStyle, StyleRegistry
 import general_functions
+from general_functions import generate_barcode_image
 
 
 @StyleRegistry.register
@@ -280,7 +281,7 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
         # 2. 粘贴右下角标签条 (icon_side_label)
         label_x = canvas_w - img_label_resized.width - margin_side
         label_y = canvas_h - img_label_resized.height - margin_bottom
-        img_label_resized_filled = general_functions.fill_left_and_right_label_barberpub_topandbottom(sku_config, img_label_resized, self.font_paths)
+        img_label_resized_filled = self.fill_left_and_right_label_barberpub_topandbottom(sku_config, img_label_resized, self.font_paths)
         canvas.paste(img_label_resized_filled, (label_x, label_y), mask=img_label_resized_filled)
         
         # --- 区域 C: 旋转生成最终面板 ---
@@ -451,3 +452,60 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
         
         canvas_top = canvas
         return canvas_top
+    
+    def fill_left_and_right_label_barberpub_topandbottom(self, sku_config, img_label_resized, fonts_paths):
+        """
+        填充 Barberpub 天地盖样式左右侧面板的标签区域
+        
+        功能：只填充顶部的两个条形码（SKU + SN码），底部4个运输标识图片自带
+        使用 generate_barcode_image 生成纯条形码，然后手动绘制文字
+        """
+        tw, th = img_label_resized.size
+        draw = ImageDraw.Draw(img_label_resized)
+        
+        # 加载字体
+        font_path = fonts_paths['CentSchbook BT']
+        
+        # ========== 顶部条形码区域（约35%高度）==========
+        barcode_zone_h = int(th * 0.35)
+        
+        # 纯条形码高度（不含文字）：占条形码区域的89%（增大）
+        barcode_only_h = int(barcode_zone_h * 0.89)
+        # 条形码顶部间距：10% 
+        barcode_y = int(barcode_zone_h * 0.10)
+        
+        # 文字高度：占条形码区域的22%（增大）
+        text_font_size = int(barcode_zone_h * 0.22)
+        text_font = ImageFont.truetype(font_path, text_font_size)
+        # 文字位置：条形码下方，留出2%的小间距，让文字更靠近底部
+        text_y = barcode_y + barcode_only_h + int(barcode_zone_h * 0.01)
+        
+        # ========== 左侧 SKU 条形码（占宽度的52%，比SN更宽）==========
+        sku_name = sku_config.sku_name
+        sku_barcode_w = int(tw * 0.52)
+        sku_barcode_x = int(tw * 0.01)  # 左边距1%
+        
+        # 生成纯条形码（不带文字）
+        sku_barcode_img = generate_barcode_image(sku_name, width=sku_barcode_w, height=barcode_only_h)
+        img_label_resized.paste(sku_barcode_img, (sku_barcode_x, barcode_y), mask=sku_barcode_img)
+        
+        # 在条形码下方居中绘制文字
+        sku_text_w = draw.textlength(sku_name, font=text_font)
+        sku_text_x = sku_barcode_x + (sku_barcode_w - sku_text_w) // 2
+        draw.text((sku_text_x, text_y), sku_name, font=text_font, fill=(0, 0, 0))
+        
+        # ========== 右侧 SN 条形码（占宽度的42%）==========
+        sn_code = sku_config.side_text['sn_code']
+        sn_barcode_w = int(tw * 0.42)
+        sn_barcode_x = int(tw * 0.56)  # 从56%位置开始（留4%间距）
+        
+        # 生成纯条形码（不带文字）
+        sn_barcode_img = generate_barcode_image(sn_code, width=sn_barcode_w, height=barcode_only_h)
+        img_label_resized.paste(sn_barcode_img, (sn_barcode_x, barcode_y), mask=sn_barcode_img)
+        
+        # 在条形码下方居中绘制文字
+        sn_text_w = draw.textlength(sn_code, font=text_font)
+        sn_text_x = sn_barcode_x + (sn_barcode_w - sn_text_w) // 2
+        draw.text((sn_text_x, text_y), sn_code, font=text_font, fill=(0, 0, 0))
+        
+        return img_label_resized
