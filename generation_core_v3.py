@@ -12,6 +12,7 @@ import style_barberpub_topandbottom
 import style_barberpub_doubleopening
 import style_barberpub_fulloverlap
 import style_exacme_fulloverlap
+import style_exacme_doubleopening
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -158,15 +159,16 @@ if __name__ == "__main__":
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6180-S124SG",
-        length_cm=99.5,
-        width_cm=22.0,
-        height_cm=42.0,
-        style_name="exacme_fulloverlap",  # 指定样式
+        sku_name="6180-CP12G",
+        length_cm=97.5,
+        width_cm=39.5,
+        height_cm=18.0,
+        style_name="exacme_doubleopening",  # 指定样式
         ppi=150,
 
         color='Seafoam Green',
-        product='Electric Beauty SPA Chair',
+        product='TRAMPOLINE PAD',
+        product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER',
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
@@ -175,7 +177,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_fulloverlap", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_doubleopening", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
