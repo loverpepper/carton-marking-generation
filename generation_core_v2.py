@@ -10,6 +10,7 @@ from style_base import StyleRegistry
 import style_mcombo_standard
 import style_barberpub_topandbottom
 import style_barberpub_doubleopening
+import style_exacme_topandbottom
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -155,15 +156,15 @@ if __name__ == "__main__":
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6154-CZ-2933BK-1",
-        length_cm=67.5,
-        width_cm=67.5,
-        height_cm=44,
-        style_name="barberpub_doubleopening",  # 指定样式
+        sku_name="6185-D10TU-1",
+        length_cm=191,   # 修正为长方形尺寸 (根据样图比例估计)
+        width_cm=65,     # 宽度较窄
+        height_cm=14,    # 高度
+        style_name="exacme_topandbottom",  # 指定样式
         ppi=150,
 
         color='(CREAM WHITE)',
-        product='Vintage Barber Chair',
+        product='DOUBLE-FRAME TRAMPOLINE',
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="barberpub_doubleopening", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
