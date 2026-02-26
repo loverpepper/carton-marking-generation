@@ -158,16 +158,12 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         
         # 把正唛公司logo及产品名称放在正唛的正中间，logo的宽度占正身宽度的 37%，高度自适应
         icon_logo_product = self.resources['icon_logo_product']
-        icon_logo_product_target_width = int(canvas.width * 0.37)
-        icon_logo_product_resized = icon_logo_product.resize((icon_logo_product_target_width, int(icon_logo_product_target_width * icon_logo_product.height / icon_logo_product.width)), Image.Resampling.LANCZOS)
-        # general_functions.paste_image_center_with_heightorwidth(canvas, icon_logo_product, width=icon_logo_product_target_width)
         
         
         
         # 放置左下角正唛公司信息和右下角SKU_name
         icon_company = self.resources['icon_company']
         icon_company_target_width = int(canvas.width * 0.19) # 公司信息占正身宽度的 19%
-        icon_company_resized = icon_company.resize((icon_company_target_width, int(icon_company_target_width * icon_company.height / icon_company.width)), Image.Resampling.LANCZOS)
         
         font_size_bottom_right = int(canvas.height * 0.14) # 右下角SKU_name字体大小占正身高度的 14%
         font_bottom_right = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_bottom_right)
@@ -184,7 +180,7 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
             children=[
                 # --- 左下角元素 ---
                 # 给图片自己设置大的安全内边距，把它“撑”离左下角
-                engine.Image(icon_company_resized, nudge_y= int( icon_company_resized.height * 0.2) ),  # 图片本身的高度就是它的安全边距，这样就能保证图片完全在安全区域内
+                engine.Image(icon_company, width=icon_company_target_width, nudge_y=int(icon_company_target_width * icon_company.height / icon_company.width * 0.2)),  # 图片本身的高度就是它的安全边距，这样就能保证图片完全在安全区域内
 
                 # --- 右下角元素 ---
                 engine.Text(
@@ -209,7 +205,7 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
             padding=0,                    # 大面板也不要 padding，保证顶底贴边
             children=[
                 top_row,       # 顶部行 (自带 safe padding)
-                engine.Image(icon_logo_product_resized), # 中间的公司logo和产品名称（自动居中，无需额外 padding）
+                engine.Image(icon_logo_product, width=int(canvas.width * 0.37)), # 中间的公司logo和产品名称（自动居中，无需额外 padding）
                 bottom_row     # 底部行 (左侧自带 padding，右侧贴边)
             ]
         )
@@ -257,8 +253,13 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
 
         # 【小魔法】：对于第二行需要缩进的 KG 重量，
         # 你可以直接塞一个不可见的 Element 进去当“隐形砖块”占位！
-        # 假设 "G.W./N.W. :" 这串粗体字大约宽 250 像素
-        indent_spacer = engine.Spacer(width=155, height=1)
+        # 先获取 "G.W./N.W. :" 这串字在当前动态字号下的真实包围盒
+        gw_bbox = font_bold.getbbox("G.W./N.W. :")
+        # 真实宽度 = 右边界 - 左边界
+        gw_text_width = gw_bbox[2] - gw_bbox[0] 
+        
+        # 制造一个绝对精准的隐形砖块！
+        indent_spacer = engine.Spacer(width=gw_text_width, height=1)
 
         row_weight_kg = engine.Row(
             spacing=10,
@@ -391,8 +392,6 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         ##################################top row##################################
         # 准备图片资源
         icon_top_logo = self.resources['icon_top_logo']
-        icon_top_loge_target_width = int(canvas.width * 0.15) # 顶部logo占侧身宽度的 15%
-        icon_top_logo_resized = icon_top_logo.resize((icon_top_loge_target_width, int(icon_top_loge_target_width * icon_top_logo.height / icon_top_logo.width)), Image.Resampling.LANCZOS)
         
         # 准备字体 
         font_size_top_right = int(canvas.height * 0.22) # 右上角字体大小占正身高度的 22%
@@ -419,7 +418,7 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
             children=[
                 # --- 左边元素 ---
                 # 给图片自己设置大的安全内边距，把它“撑”离左下角
-                engine.Image(icon_top_logo_resized, nudge_y= int( icon_top_logo_resized.height * 0.0) ),  # 图片本身的高度就是它的安全边距，这样就能保证图片完全在安全区域内
+                engine.Image(icon_top_logo, width=int(canvas.width * 0.15)),
                 # --- 右边元素 ---
                 engine.Text(f"{product_size_number}FT", font=font_top_right)
             ]
@@ -440,14 +439,6 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         icon_top_attention = self.resources['icon_top_attention']
         icon_top_smallicons = self.resources['icon_top_smallicons']
         
-        #调整图片宽度，使它们占侧身宽度的 15%、10%、20%
-        icon_top_notice_tatget_width = int(canvas.width * 0.22)
-        icon_top_attention_target_width = int(canvas.width * 0.35)
-        icon_top_smallicons_target_width = int(canvas.width * 0.12)
-        icon_top_notice_resized = icon_top_notice.resize((icon_top_notice_tatget_width, int(icon_top_notice_tatget_width * icon_top_notice.height / icon_top_notice.width)), Image.Resampling.LANCZOS)
-        icon_top_attention_resized = icon_top_attention.resize((icon_top_attention_target_width, int(icon_top_attention_target_width * icon_top_attention.height / icon_top_attention.width)), Image.Resampling.LANCZOS)
-        icon_top_smallicons_resized = icon_top_smallicons.resize((icon_top_smallicons_target_width, int(icon_top_smallicons_target_width * icon_top_smallicons.height / icon_top_smallicons.width)), Image.Resampling.LANCZOS)
-        
         # 加入底部容器
         bottom_row = engine.Row(
             fixed_width=sku_config.l_px,  # 锁死宽度
@@ -455,9 +446,9 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
             align='bottom',               # 【关键】垂直方向靠下对齐
             padding=top_padding,          # 与顶行保持一致的安全边距
             children=[
-                engine.Image(icon_top_notice_resized, nudge_x = 0, nudge_y= 0 ),  
-                engine.Image(icon_top_attention_resized, nudge_x = -int(canvas.width * 0.05), nudge_y= 0 ),  
-                engine.Image(icon_top_smallicons_resized, nudge_x = 0, nudge_y= 0 ),  
+                engine.Image(icon_top_notice, width=int(canvas.width * 0.22)),
+                engine.Image(icon_top_attention, width=int(canvas.width * 0.35), nudge_x=-int(canvas.width * 0.05)),
+                engine.Image(icon_top_smallicons, width=int(canvas.width * 0.12)),
             ]
         )
         
