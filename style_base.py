@@ -64,6 +64,14 @@ class BoxMarkStyle(ABC):
         """返回该样式所需的额外参数列表"""
         return []
     
+    def get_preview_images(self):
+        """
+        返回该样式的实例预览图列表（PIL.Image 对象）。
+        默认实现返回空列表。子类可覆写此方法，从 assets 中加载对应的实例生成图。
+        返回格式: [(filename_str, PIL.Image), ...]
+        """
+        return []
+    
     @abstractmethod
     def get_layout_config(self, sku_config):
         """

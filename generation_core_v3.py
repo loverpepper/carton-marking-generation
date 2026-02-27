@@ -13,6 +13,7 @@ import style_barberpub_doubleopening
 import style_barberpub_fulloverlap
 import style_exacme_fulloverlap
 import style_exacme_doubleopening
+import style_exacme_topandbottom_squaretrampoline
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -121,8 +122,6 @@ class BoxMarkGenerator:
         canvas.save(output_path, "PDF", resolution=sku_config.ppi, quality=100)
         # canvas_rgb.save(output_path, "PDF", resolution=sku_config.ppi, quality=100)
         
-        
-        
         total_width, total_height = canvas.size
         print(f"✅ 箱唛已生成为PDF！文件: {output_path}")
         print(f"   样式: {self.style_name}")
@@ -154,21 +153,21 @@ if __name__ == "__main__":
 
     box_number = {
         'total_boxes': 3,
-        'current_box': 2
+        'current_box': 1
     }
     
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6180-CP12G",
-        length_cm=97.5,
-        width_cm=39.5,
-        height_cm=18.0,
-        style_name="exacme_doubleopening",  # 指定样式
+        sku_name="6184-H812B-1",
+        length_cm=140.0,
+        width_cm=35.0,
+        height_cm=17.0,
+        style_name="exacme_topandbottom_squaretrampoline",  # 指定样式
         ppi=150,
-
+        
         color='Seafoam Green',
-        product='TRAMPOLINE PAD',
-        product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER',
+        product='Rectangle Trampoline',
+        product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_doubleopening", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_squaretrampoline", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

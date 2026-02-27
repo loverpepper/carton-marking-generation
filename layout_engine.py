@@ -116,6 +116,7 @@ class Column(Element):
     def __init__(self, children, spacing=0, align='center', padding=0, padding_x=None, padding_y=None,
                  justify='start',   # 新增：垂直分布方式，默认靠上(start)
                  fixed_height=None, # 新增：是否锁死高度
+                 fixed_width=None,  # 新增：是否锁死宽度，如果锁死宽度则不根据孩子自动调整宽度，而是使用这个固定宽度
                  **kwargs):
         
         padding_x = padding if padding_x is None else padding_x
@@ -133,8 +134,11 @@ class Column(Element):
             height = dynamic_height
 
         # 3. 宽度逻辑保持不变 (依然由最宽的孩子决定)
-        width = max([child.width for child in children]) if children else 0
-        width += 2 * padding_x
+        if fixed_width is not None:
+            width = fixed_width
+        else:
+            width = max([child.width for child in children]) if children else 0
+            width += 2 * padding_x
         
         super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y)
         
@@ -165,6 +169,8 @@ class Column(Element):
                 offset_x = (self.width - 2 * self.padding_x - child.width) // 2
             elif self.align == 'right':
                 offset_x = self.width - 2 * self.padding_x - child.width
+            elif self.align == 'left':
+                offset_x = 0
             
             child_x = self.x + offset_x
             
@@ -184,15 +190,21 @@ class Row(Element):
     def __init__(self, children, spacing=0, align='center', padding=0, padding_x=None, padding_y=None,
                  justify='start', # 新增：排列方式，默认靠左(start)，可选 'space-between'
                  fixed_width=None, # 新增：是否锁死宽度，如果锁死宽度则不根据孩子自动调整宽度，而是使用这个固定宽度
+                 fixed_height=None, # 新增：是否锁死高度
                  ):
         
         padding_x = padding if padding_x is None else padding_x
         padding_y = padding if padding_y is None else padding_y
         
         # 1. 容器需要先知道自己有多大
-        # 容器的高度：由肚子里最高的那个孩子决定
-        height = max([child.height for child in children]) if children else 0
-        height += 2 * padding_y
+        # 容器的高度：由肚子里最高的那个孩子决定（动态高度）
+        dynamic_height = max([child.height for child in children]) if children else 0
+        dynamic_height += 2 * padding_y
+        
+        if fixed_height is not None:
+            height = fixed_height
+        else:
+            height = dynamic_height
         
         # 容器的宽度：所有孩子的宽度总和 + 它们之间的间距总和
         total_children_width = sum([child.width for child in children])
@@ -231,7 +243,9 @@ class Row(Element):
         for child in self.children:
             # --- 处理垂直对齐 (居中、靠上、靠下) ---
             offset_y = 0
-            if self.align == 'center':
+            if self.align == 'top':
+                offset_y = 0
+            elif self.align == 'center':
                 # 居中偏移量 = (容器可用高度 - 孩子高度) / 2
                 offset_y = (self.height - 2 * self.padding_y - child.height) // 2
             elif self.align == 'bottom':
