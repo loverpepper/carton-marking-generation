@@ -140,6 +140,9 @@ class Column(Element):
             width = max([child.width for child in children]) if children else 0
             width += 2 * padding_x
         
+        if justify == 'space-between' and fixed_height is None:
+            raise ValueError("❌ 引擎排版错误: Column 容器使用 justify='space-between' 时，必须指定 fixed_height，否则无法计算剩余垂直空间！")
+        
         super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y)
         
         self.children = children
@@ -215,6 +218,9 @@ class Row(Element):
             width = fixed_width
         else:
             width = dynamic_width
+        
+        if justify == 'space-between' and fixed_width is None:
+            raise ValueError("❌ 引擎排版错误: Row 容器使用 justify='space-between' 时，必须指定 fixed_width，否则无法计算剩余水平空间！")
         
         super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y)
         
