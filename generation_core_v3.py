@@ -143,6 +143,11 @@ def visualize_layout(sku_config, generator):
 
 # --- 测试运行 ---
 if __name__ == "__main__":
+    
+    # 创建生成器
+    base_dir = Path.Path(__file__).parent
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_squaretrampoline", ppi=150)
+    
     # 使用新框架生成箱唛
     sku_text = {
         'gw_value': 30.9, #LBS 毛重
@@ -171,12 +176,9 @@ if __name__ == "__main__":
         size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
-        sponge_verified=True # 是否通过海绵测试, 可选参数, 有些样式会用到
+        sponge_verified=True, # 是否通过海绵测试, 可选参数, 有些样式会用到
+        img_line_drawing = base_dir / '侧唛线描图.png' # 可选参数，Barberpub 对开盖样式需要线稿图作为侧唛背景
     )
-    
-    # 创建生成器
-    base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_squaretrampoline", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

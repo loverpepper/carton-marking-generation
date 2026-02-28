@@ -176,7 +176,7 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         icon_company = self.resources['icon_company']
         icon_company_target_width = int(canvas.width * 0.19) # 公司信息占正身宽度的 19%
         
-        font_size_bottom_right = int(canvas.height * 0.21) # 右下角SKU_name字体大小占正身高度的 21%
+        font_size_bottom_right = max(int(canvas.height * 0.21), int( 5.0 * sku_config.dpi)) # 右下角SKU_name字体大小占正身高度的 21%
         font_bottom_right = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_bottom_right)
         # SKU 黑框内部的文字内边距 ( 1 厘米)
         sku_box_internal_padding = int(1.0  * sku_config.dpi)
