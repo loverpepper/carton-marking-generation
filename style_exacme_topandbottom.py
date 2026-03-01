@@ -94,7 +94,7 @@ class ExacmeTopAndBottomStyle(BoxMarkStyle):
         """加载字体路径 """
         font_base = self.base_dir / 'assets' / 'Exacme' / '天地盖' / '字体'
         self.font_paths = {
-            'CentSchbook BT': str(font_base / 'arialbd.ttf'), # 猜测是Century Schoolbook
+            'CentSchbook BT': str(font_base / 'arialbd.ttf'), # Century Schoolbook
             'Calibri Bold': str(font_base / 'arialbd.ttf'),
             'CENSBKB': str(font_base / 'arialbd.ttf'),
         }
@@ -146,16 +146,12 @@ class ExacmeTopAndBottomStyle(BoxMarkStyle):
 
             if i == 0:
                 # 左边图标：往左靠 (例如左边距 2% + 稍微一点偏移)
-                # 之前是 section_w * 0 + (section_w - w)/2 -> 在前1/3居中
-                # 现在改为靠左，与上方的Box信息对齐或稍偏右
                 pos_x = int(canvas_w * 0.02)
             elif i == 1:
                 # 中间图标：保持绝对居中
                 pos_x = (canvas_w - res_icon.width) // 2
             else:
                 # 右边图标：靠右
-                # 原逻辑: section_w * 2 + (section_w - res_icon.width) // 2
-                # 改为靠右对齐，类似左边的 margin
                 pos_x = canvas_w - res_icon.width - int(canvas_w * 0.02)
 
             canvas.paste(res_icon, (pos_x, pos_y), mask=res_icon)
@@ -228,7 +224,6 @@ class ExacmeTopAndBottomStyle(BoxMarkStyle):
         full_color_text = f"COL : {color_text}"
 
         # 字体颜色: 浅色/白色? 样图中 fondo 是深色，字是浅色
-        # 假设底框是深色的
         font_col = ImageFont.truetype(self.font_paths['Calibri Bold'], int(col_frame_h * 0.5))
 
         # 文字居中于底框
@@ -258,6 +253,7 @@ class ExacmeTopAndBottomStyle(BoxMarkStyle):
         # left_side_panel: (x0, y1, sku_config.h_px, sku_config.w_px) -> H x W
 
         canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
+        draw = ImageDraw.Draw(canvas)
         cw, ch = canvas.size
 
         # 1. 侧唛标签 (Barcode 区域)
@@ -279,8 +275,177 @@ class ExacmeTopAndBottomStyle(BoxMarkStyle):
         label_y = (ch - img_label_resized.height) // 2
         canvas.paste(img_label_resized, (label_x, label_y), mask=img_label_resized)
 
+        # 2. SKU 旁边的 Box 颜色块 (side_sku_box)
+        # 用户需求：垂直放在侧边箱唛的side_label元素的图层之上，然后靠侧边的左放在黑边上
+        img_side_sku_box = self.resources['side_sku_box']
+
+        # 调整大小: 假设高度为 label 高度的 12% (稍微调小一点，确保能放入黑边)
+        sku_box_h = int(img_label_resized.height * 0.12)
+        img_side_sku_resized = general_functions.scale_by_height(img_side_sku_box, sku_box_h)
+
+        # side_sku_box 的位置：
+        #box_x = label_x + int(img_label_resized.width * 0.04) # 靠左
+
+        # 让我们把 box 放在 label 左上部分（黑框区域）。
+        box_x = label_x + int(img_label_resized.width * 0.13) # 经验值：左侧黑框边距
+        box_y = label_y + int(img_label_resized.height * 0.185) # 顶部边距
+
+        canvas.paste(img_side_sku_resized, (box_x, box_y), mask=img_side_sku_resized)
+
+        # 3. 写入 Box 信息 "Box X of Y" (竖着写入)
+        current_box = sku_config.box_number['current_box']
+        total_boxes = sku_config.box_number['total_boxes']
+        box_text = f"Box {current_box} of {total_boxes}"
+
+        # 创建临时 canvas 绘制文字然后旋转
+        font_box_size = int(img_side_sku_resized.width * 0.65) # 字体大小基于宽度
+        font_box = ImageFont.truetype(self.font_paths['Calibri Bold'], font_box_size)
+
+        bbox_box = draw.textbbox((0,0), box_text, font=font_box)
+        text_w = bbox_box[2] - bbox_box[0]
+        text_h = bbox_box[3] - bbox_box[1]
+
+        # 创建透明层绘制文字
+        txt_img = Image.new('RGBA', (int(text_w), int(text_h)), (255, 255, 255, 0))
+        d_txt = ImageDraw.Draw(txt_img)
+        d_txt.text((0, 0), box_text, font=font_box, fill=(0, 0, 0))
+
+        # 改为90
+        txt_img_rot = txt_img.rotate(90, expand=True)
+
+        # 居中显示在 box 图片上
+        text_x = box_x + (img_side_sku_resized.width - txt_img_rot.width) // 2
+        # 用户需求：再稍微靠左一点
+        text_x -= int(img_side_sku_resized.width * 0.17)
+
+        text_y = box_y + (img_side_sku_resized.height - txt_img_rot.height) // 2
+
+        canvas.paste(txt_img_rot, (text_x, text_y), mask=txt_img_rot)
+
+        # 4. 写入 SKU (在 side_sku_box 下方，也是竖着写入)
+        sku_text = sku_config.sku_name
+        font_sku_size = int(img_side_sku_resized.width * 2.3) # 基于宽度
+        font_sku = ImageFont.truetype(self.font_paths['Calibri Bold'], font_sku_size)
+
+        bbox_sku = draw.textbbox((0,0), sku_text, font=font_sku)
+        sku_w = bbox_sku[2] - bbox_sku[0]
+        sku_h = bbox_sku[3] - bbox_sku[1]
+
+        txt_sku_img = Image.new('RGBA', (int(sku_w), int(sku_h)), (255, 255, 255, 0))
+        d_sku = ImageDraw.Draw(txt_sku_img)
+        d_sku.text((0, 0), sku_text, font=font_sku, fill=(161, 142, 102))
+
+        txt_sku_rot = txt_sku_img.rotate(90, expand=True) # 同样旋转改为90
+
+        # 位置: side_sku_box 下方，水平居中对齐 box
+        # 间距
+        gap = int(ch * 0.015)
+        sku_x = box_x + (img_side_sku_resized.width - txt_sku_rot.width) // 2
+
+        # SKU信息再靠左一点
+        sku_x -= int(img_side_sku_resized.width * 1.1)
+
+        sku_y = box_y + img_side_sku_resized.height + gap
+
+        # 颜色: 白色 (在黑框上)
+        canvas.paste(txt_sku_rot, (sku_x, sku_y), mask=txt_sku_rot)
+
+        # 5. 生成条形码 (SKU 条码) - 放置在 side_sku_box 右侧区域
+        barcode_len_px = int(img_label_resized.height * 0.31) # 缩短条码长度
+        barcode_thickness_px = int(img_label_resized.width * 0.33)
+
+        # 1. SKU Barcode
+        sku_code = sku_config.sku_name
+        # 调用 general_functions 生成条码 (返回只有条码的透明图片)
+        # generate_barcode_image(code, width, height) -> width is barcode length, height is bars height
+        img_sku_barcode = general_functions.generate_barcode_image(sku_code, barcode_len_px, barcode_thickness_px)
+
+        # 旋转 90 度 (变成竖条: height becomes width, width becomes height)
+        img_sku_barcode_rot = img_sku_barcode.rotate(90, expand=True)
+
+        # 定位: 在 side_sku_box 的右边
+        # box_x 是 side_sku_box 的左边缘
+        # barcode_x 应该在 box 右侧
+        barcode_x = box_x + img_side_sku_resized.width + int(cw * 0.05)
+
+        # 第一个放在上面，第二个放在下面
+        barcode_y_1 = label_y + int(img_label_resized.height * 0.02) # 顶部对齐 label 内容区
+
+        canvas.paste(img_sku_barcode_rot, (barcode_x, barcode_y_1), mask=img_sku_barcode_rot)
+
+        # 2. 第二个条形码
+        second_code = getattr(sku_config, 'upc_number', None) or "BOX-CODE-EXAMPLE"
+        if hasattr(sku_config, 'side_text') and isinstance(sku_config.side_text, dict):
+             second_code = sku_config.side_text.get('sn_code', second_code)
+
+        img_sn_barcode = general_functions.generate_barcode_image(second_code, barcode_len_px, barcode_thickness_px)
+        img_sn_barcode_rot = img_sn_barcode.rotate(90, expand=True)
+
+        # 第二个条码在第一个条码下方 (x 坐标相同)
+        barcode_x_2 = barcode_x
+        # 间距调小一点
+        gap_barcodes = int(img_label_resized.height * 0.02)
+        barcode_y_2 = barcode_y_1 + img_sku_barcode_rot.height + gap_barcodes
+
+        canvas.paste(img_sn_barcode_rot, (barcode_x_2, barcode_y_2), mask=img_sn_barcode_rot)
+
+        # 条形码右侧的微小文字 (竖排)
+        # 上方条码右侧: "09429381135347" (UPC or similar)
+        # 下方条码右侧: "MADE IN CHINA"
+        # 字体 调大一点
+        tiny_font_size = int(img_label_resized.width * 0.06)
+        tiny_font = ImageFont.truetype(self.font_paths['Calibri Bold'], tiny_font_size)
+
+        # 上方文字 (优先使用 side_text 中的 sn_code)
+        text_up = "BOX-CODE-EXAMPLE"
+        if hasattr(sku_config, 'side_text') and isinstance(sku_config.side_text, dict):
+             text_up = sku_config.side_text.get('sn_code', text_up)
+        # 也可以回退到 upc_number 如果 sn_code 不存在
+        if text_up == "BOX-CODE-EXAMPLE" and getattr(sku_config, 'upc_number', None):
+            text_up = sku_config.upc_number
+
+        bbox_up = draw.textbbox((0,0), text_up, font=tiny_font)
+        w_up = bbox_up[2] - bbox_up[0]
+        h_up = bbox_up[3] - bbox_up[1]
+
+        txt_up_img = Image.new('RGBA', (int(w_up), int(h_up)), (255, 255, 255, 0))
+        d_up = ImageDraw.Draw(txt_up_img)
+        d_up.text((0, 0), text_up, font=tiny_font, fill=(0, 0, 0))
+        # 旋转 90 度
+        # orientation. Vertical text usually is rotated.
+        txt_up_rot = txt_up_img.rotate(90, expand=True)
+
+        # 位置: 上方条码 (img_sku_barcode_rot) 的右侧
+        # barcode_x 是条码左边， barcode_x + width 是条码右边
+        text_up_x = barcode_x + img_sku_barcode_rot.width + int(cw * 0.005)
+        # 垂直居中于上方条码
+        text_up_y = barcode_y_1 + (img_sku_barcode_rot.height - txt_up_rot.height) // 2
+
+        canvas.paste(txt_up_rot, (text_up_x, text_up_y), mask=txt_up_rot)
+
+        # 下方文字 "MADE IN CHINA" (优先使用 side_text 中的 origin_text)
+        text_down = "MADE IN CHINA"
+        if hasattr(sku_config, 'side_text') and isinstance(sku_config.side_text, dict):
+             text_down = sku_config.side_text.get('origin_text', text_down)
+
+        bbox_down = draw.textbbox((0,0), text_down, font=tiny_font)
+        w_down = bbox_down[2] - bbox_down[0]
+        h_down = bbox_down[3] - bbox_down[1]
+
+        txt_down_img = Image.new('RGBA', (int(w_down), int(h_down)), (255, 255, 255, 0))
+        d_down = ImageDraw.Draw(txt_down_img)
+        d_down.text((0, 0), text_down, font=tiny_font, fill=(0, 0, 0))
+        txt_down_rot = txt_down_img.rotate(90, expand=True)
+
+        # 位置: 下方条码 (img_sn_barcode_rot) 的右侧
+        text_down_x = barcode_x_2 + img_sn_barcode_rot.width + int(cw * 0.005)
+        # 垂直居中于下方条码
+        text_down_y = barcode_y_2 + (img_sn_barcode_rot.height - txt_down_rot.height) // 2
+
+        canvas.paste(txt_down_rot, (text_down_x, text_down_y), mask=txt_down_rot)
+
         # 返回两个 canvas (左右侧板)
-        # 左边的需要旋转180度
+        # 左边的旋转180度
         return canvas.rotate(180), canvas
 
     def generate_exacme_long_side_panel(self, sku_config):

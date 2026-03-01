@@ -145,7 +145,7 @@ if __name__ == "__main__":
     sku_text = {
         'gw_value': 71.0,
         'nw_value': 57.9,
-        'sn_code': '08429381123115',
+        'sn_code': '09429381135347',
         'origin_text':'MADE IN CHINA',
     }
 
