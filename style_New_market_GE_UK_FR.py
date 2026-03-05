@@ -448,25 +448,6 @@ class MComboStandardStyle(BoxMarkStyle):
 
         icon_side_logo = general_functions.make_it_pure_black(Image.open(logo_file).convert('RGBA'))
 
-        # general_functions.draw_side_dynamic_bottom_bg_1(
-        #     canvas, sku_config, self.resources['icon_company'], self.font_paths, rotate_90=sku_config.rotate_side)
-
-        # # 放置侧唛标签框
-        # icon_side_label_box = self.resources['icon_side_label_box']
-        # icon_side_label_box_resized = general_functions.scale_by_height(
-        #     icon_side_label_box, int(5 * sku_config.dpi))
-        # icon_side_label_box_x, icon_side_label_box_y = int(3 * sku_config.dpi), int(4 * sku_config.dpi)
-        # canvas.paste(icon_side_label_box_resized, (icon_side_label_box_x, icon_side_label_box_y),
-        #              mask=icon_side_label_box_resized)
-        #
-        # # 放置侧唛 logo
-        # icon_side_logo = self.resources['icon_side_logo']
-        # icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, int(5 * sku_config.dpi))
-        # icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
-        # icon_side_logo_x = canvas.width - icon_side_logo_w - int(4 * sku_config.dpi)
-        # icon_side_logo_y = int(4 * sku_config.dpi)
-        # canvas.paste(icon_side_logo_resized, (icon_side_logo_x, icon_side_logo_y), mask=icon_side_logo_resized)
-
         # 1. 初始化画布
         draw = ImageDraw.Draw(canvas)
         dpi = sku_config.dpi
@@ -476,8 +457,7 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_company = general_functions.draw_dynamic_company_brand(
             sku_config, sku_config.company_name, sku_config.contact_info, font_paths, self.resources
         )
-        safe_x_start = general_functions.draw_side_dynamic_bottom_bg_1(canvas, sku_config, icon_company, font_paths,
-                                                                     rotate_90=sku_config.rotate_side)
+        safe_x_start = general_functions.draw_side_dynamic_bottom_bg_1(canvas, sku_config, icon_company, font_paths)
 
         # 3. 绘制侧唛 Logo (右上角固定位置)
         # icon_side_logo = self.resources['icon_side_logo']

@@ -13,7 +13,7 @@ class MComboStandardStyle(BoxMarkStyle):
     """MCombo 标准箱唛样式（原始样式）"""
 
     def get_style_name(self):
-        return "mcombo"
+        return "mcombo_vertical"
 
     def get_style_description(self):
         return "MCombo 标准箱唛样式 - 带公司Logo、SKU信息、条形码"
@@ -31,59 +31,33 @@ class MComboStandardStyle(BoxMarkStyle):
         x3 = sku_config.w_px + sku_config.l_px * 2
 
         # 2. 根据开关判断布局逻辑
-        if getattr(sku_config, 'rotate_side', False):
-            # --- 【立起来模式】坐标逻辑 ---
-            # Y轴节点
-            y0 = 0  # 顶盖顶部
-            y1 = sku_config.half_w_px  # 部分顶盖的起始点
-            y2 = sku_config.w_px  # 正身顶部 (大图占用了 w_px)
-            y3 = sku_config.w_px + sku_config.h_px  # 底盖顶部
+        # --- 【立起来模式】坐标逻辑 ---
+        # Y轴节点
+        y0 = 0  # 顶盖顶部
+        y1 = sku_config.half_w_px  # 部分顶盖的起始点
+        y2 = sku_config.w_px  # 正身顶部 (大图占用了 w_px)
+        y3 = sku_config.w_px + sku_config.h_px  # 底盖顶部
 
-            # 返回立起来的字典结构
-            return {
-                # 第一行：顶盖层
-                "flap_top_front1": (x0, y0, sku_config.l_px, sku_config.w_px),  # 大图盖子
-                "flap_top_side1": (x1, y1, sku_config.w_px, sku_config.half_w_px),
-                "flap_top_front2": (x2, y1, sku_config.l_px, sku_config.half_w_px),
-                "flap_top_side2": (x3, y1, sku_config.w_px, sku_config.half_w_px),
+        # 返回立起来的字典结构
+        return {
+            # 第一行：顶盖层
+            "flap_top_front1": (x0, y0, sku_config.l_px, sku_config.w_px),  # 大图盖子
+            "flap_top_side1": (x1, y1, sku_config.w_px, sku_config.half_w_px),
+            "flap_top_front2": (x2, y1, sku_config.l_px, sku_config.half_w_px),
+            "flap_top_side2": (x3, y1, sku_config.w_px, sku_config.half_w_px),
 
-                # 第二行：正身层
-                "panel_front1": (x0, y2, sku_config.l_px, sku_config.h_px),
-                "panel_side1": (x1, y2, sku_config.w_px, sku_config.h_px),
-                "panel_front2": (x2, y2, sku_config.l_px, sku_config.h_px),
-                "panel_side2": (x3, y2, sku_config.w_px, sku_config.h_px),
+            # 第二行：正身层
+            "panel_front1": (x0, y2, sku_config.l_px, sku_config.h_px),
+            "panel_side1": (x1, y2, sku_config.w_px, sku_config.h_px),
+            "panel_front2": (x2, y2, sku_config.l_px, sku_config.h_px),
+            "panel_side2": (x3, y2, sku_config.w_px, sku_config.h_px),
 
-                # 第三行：底盖层
-                "flap_btm_front1": (x0, y3, sku_config.l_px, sku_config.half_w_px),
-                "flap_btm_side1": (x1, y3, sku_config.w_px, sku_config.half_w_px),
-                "flap_btm_front2": (x2, y3, sku_config.l_px, sku_config.w_px),  # 大图盖子
-                "flap_btm_side2": (x3, y3, sku_config.w_px, sku_config.half_w_px),
-            }
-        else:
-            # --- 【水平/普通模式】坐标逻辑 ---
-            y0 = 0  # 顶盖顶部
-            y1 = sku_config.half_w_px  # 正身顶部
-            y2 = sku_config.half_w_px + sku_config.h_px  # 底盖顶部
-
-            return {
-                # 第一行：顶盖层
-                "flap_top_front1": (x0, y0, sku_config.l_px, sku_config.half_w_px),
-                "flap_top_side1": (x1, y0, sku_config.w_px, sku_config.half_w_px),
-                "flap_top_front2": (x2, y0, sku_config.l_px, sku_config.half_w_px),
-                "flap_top_side2": (x3, y0, sku_config.w_px, sku_config.half_w_px),
-
-                # 第二行：正身层
-                "panel_front1": (x0, y1, sku_config.l_px, sku_config.h_px),
-                "panel_side1": (x1, y1, sku_config.w_px, sku_config.h_px),
-                "panel_front2": (x2, y1, sku_config.l_px, sku_config.h_px),
-                "panel_side2": (x3, y1, sku_config.w_px, sku_config.h_px),
-
-                # 第三行：底盖层
-                "flap_btm_front1": (x0, y2, sku_config.l_px, sku_config.half_w_px),
-                "flap_btm_side1": (x1, y2, sku_config.w_px, sku_config.half_w_px),
-                "flap_btm_front2": (x2, y2, sku_config.l_px, sku_config.half_w_px),
-                "flap_btm_side2": (x3, y2, sku_config.w_px, sku_config.half_w_px),
-            }
+            # 第三行：底盖层
+            "flap_btm_front1": (x0, y3, sku_config.l_px, sku_config.half_w_px),
+            "flap_btm_side1": (x1, y3, sku_config.w_px, sku_config.half_w_px),
+            "flap_btm_front2": (x2, y3, sku_config.l_px, sku_config.w_px),  # 大图盖子
+            "flap_btm_side2": (x3, y3, sku_config.w_px, sku_config.half_w_px),
+        }
 
     def get_panels_mapping(self, sku_config):
         """定义每个区域应该粘贴哪个面板"""
@@ -100,8 +74,6 @@ class MComboStandardStyle(BoxMarkStyle):
             "flap_top_side2": "side_up",
             "flap_btm_side1": "side_down",
             "flap_btm_side2": "side_down",
-
-
         }
 
     def generate_all_panels(self, sku_config):
@@ -194,79 +166,45 @@ class MComboStandardStyle(BoxMarkStyle):
         return fonts
 
     def generate_left_panel(self, sku_config):
-        if sku_config.rotate_side:
-            """生成左侧面板"""
-            canvas_left_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.w_px),
-                                       sku_config.background_color)
-            canvas_left_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                         sku_config.background_color)
+        """生成左侧面板"""
+        canvas_left_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.w_px),
+                                   sku_config.background_color)
+        canvas_left_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
+                                     sku_config.background_color)
 
-            total_box_number = sku_config.box_number['total_boxes']
-            current_box_number = sku_config.box_number['current_box']
-            icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
+        total_box_number = sku_config.box_number['total_boxes']
+        current_box_number = sku_config.box_number['current_box']
+        icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
 
-            icon_left_up_panel = icon_left_panel
-            # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
+        icon_left_up_panel = icon_left_panel
+        # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
 
-            canvas_left_up = general_functions.paste_center_with_height(
-                canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
-            # canvas_left_down = general_functions.paste_center_with_height(
-            #     canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
-        else:
-            """生成左侧面板"""
-            canvas_left_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                       sku_config.background_color)
-            canvas_left_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                         sku_config.background_color)
-
-            total_box_number = sku_config.box_number['total_boxes']
-            icon_left_panel = self.resources[f'icon_left_{total_box_number}_panel']
-
-            icon_left_up_panel = icon_left_panel
-            icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
-
-            canvas_left_up = general_functions.paste_center_with_height(
-                canvas_left_up, icon_left_up_panel, height_cm=10, dpi=sku_config.dpi)
-            canvas_left_down = general_functions.paste_center_with_height(
-                canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
+        canvas_left_up = general_functions.paste_center_with_height(
+            canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
+        # canvas_left_down = general_functions.paste_center_with_height(
+        #     canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
 
         return canvas_left_up, canvas_left_down
 
     def generate_right_panel(self, sku_config):
-        if sku_config.rotate_side:
-            """生成右侧面板"""
-            canvas_right_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                        sku_config.background_color)
-            canvas_right_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.w_px),
-                                          sku_config.background_color)
 
-            total_box_number = sku_config.box_number['total_boxes']
-            current_box_number = sku_config.box_number['current_box']
-            icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
+        """生成右侧面板"""
+        canvas_right_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
+                                    sku_config.background_color)
+        canvas_right_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.w_px),
+                                      sku_config.background_color)
 
-            icon_right_panel_down = icon_left_panel.rotate(180, expand=True)
+        total_box_number = sku_config.box_number['total_boxes']
+        current_box_number = sku_config.box_number['current_box']
+        icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
 
-            # canvas_right_up = general_functions.paste_center_with_height(
-            #     canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
-            canvas_right_down = general_functions.paste_center_with_height(
-                canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
-        else:
-            """生成右侧面板"""
-            canvas_right_up = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                        sku_config.background_color)
-            canvas_right_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px),
-                                          sku_config.background_color)
+        icon_right_panel_down = icon_left_panel.rotate(180, expand=True)
 
-            total_box_number = sku_config.box_number['total_boxes']
-            icon_right_panel = self.resources[f'icon_right_{total_box_number}-1_panel']
+        # canvas_right_up = general_functions.paste_center_with_height(
+        #     canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
+        canvas_right_down = general_functions.paste_center_with_height(
+            canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
 
-            icon_right_panel_up = icon_right_panel.rotate(180, expand=True)
-            icon_right_panel_down = icon_right_panel
-
-            canvas_right_up = general_functions.paste_center_with_height(
-                canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
-            canvas_right_down = general_functions.paste_center_with_height(
-                canvas_right_down, icon_right_panel_down, height_cm=9, dpi=sku_config.dpi)
         return canvas_right_up, canvas_right_down
 
     def generate_front_panel(self, sku_config):
@@ -292,12 +230,6 @@ class MComboStandardStyle(BoxMarkStyle):
         else:
             # 宽度未超限，使用按高度缩放的结果
             icon_trademark_resized = icon_by_height
-
-
-
-
-        # icon_trademark_target_h = canvas_h // 3
-        # icon_trademark_resized = general_functions.scale_by_height(icon_trademark, icon_trademark_target_h)
 
         icon_trademark_target_w, icon_trademark_target_h = icon_trademark_resized.size
         paste_x = (canvas_w - icon_trademark_target_w) // 2
@@ -354,14 +286,6 @@ class MComboStandardStyle(BoxMarkStyle):
             bbox_product = product_font.getbbox(product_text)
             product_w = bbox_product[2] - bbox_product[0]
 
-
-
-
-        # product_text = sku_config.product
-        # product_font = fonts['product_font']
-        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
-        # product_w = bbox_product[2] - bbox_product[0]
-
         size_text = sku_config.size
         size_font = fonts['size_font']
         bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
@@ -396,14 +320,13 @@ class MComboStandardStyle(BoxMarkStyle):
 
     def generate_side_panel(self, sku_config):
         """生成侧面面板"""
-        if sku_config.rotate_side:
-            canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
-            self.bottom_gb_h_px1 = int(8 * sku_config.dpi)
-        else:
-            canvas = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.h_px), sku_config.background_color)
+
+        canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
+        self.bottom_gb_h_px1 = int(8 * sku_config.dpi)
+
 
         general_functions.draw_side_dynamic_bottom_bg_1(
-            canvas, sku_config, self.resources['icon_company'], self.font_paths, rotate_90=sku_config.rotate_side)
+            canvas, sku_config, self.resources['icon_company'], self.font_paths)
 
         # 放置侧唛标签框
         icon_side_label_box = self.resources['icon_side_label_box']
@@ -423,18 +346,14 @@ class MComboStandardStyle(BoxMarkStyle):
 
         # 放置侧唛文字信息框
         icon_side_text_box_spacing_left = int(3 * sku_config.dpi)
-        if sku_config.rotate_side:
-            icon_side_text_box_spacing_bottom = int(2 * sku_config.dpi)
-        else:
-            icon_side_text_box_spacing_bottom = int(3 * sku_config.dpi)
+        icon_side_text_box_spacing_bottom = int(2 * sku_config.dpi)
+
         table_height_px = int(8 * sku_config.dpi)
 
         base_x = icon_side_text_box_spacing_left
-        if sku_config.rotate_side:
-            base_y = canvas.height - self.bottom_gb_h_px1 - icon_side_text_box_spacing_bottom - table_height_px
 
-        else:
-            base_y = canvas.height - sku_config.bottom_gb_h_px - icon_side_text_box_spacing_bottom - table_height_px
+        base_y = canvas.height - self.bottom_gb_h_px1 - icon_side_text_box_spacing_bottom - table_height_px
+
 
         icon_side_text_box = self.resources['icon_side_text_box'].copy()
         icon_side_text_box_resized = general_functions.scale_by_height(icon_side_text_box, table_height_px)
@@ -457,8 +376,7 @@ class MComboStandardStyle(BoxMarkStyle):
                 icon_side_text_box_resized, sku_config, self.font_paths)
             canvas.paste(fill_image, (base_x, base_y), mask=icon_side_text_box_resized)
 
-        if sku_config.rotate_side:
-            canvas = canvas.rotate(90, expand=True)
+        canvas = canvas.rotate(90, expand=True)
         return canvas
 
     def generate_side_up_down_panel(self, sku_config):

@@ -200,7 +200,7 @@ if __name__ == "__main__":
         side_text=sku_text,
         box_number=box_number,
         sponge_verified=True,  # 是否通过海绵测试, 可选参数, 有些样式会用到
-        rotate_side=True, legal_data=legal_info,
+        rotate_side=False, legal_data=legal_info,
         company_name="NEWACME LLC",
         contact_info="www.mcombo.com / sale_uk@newacmellc.com",
         legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=1, legal_3_6=1,
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_vertical", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
