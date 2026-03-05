@@ -666,7 +666,7 @@ def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
     draw.text((right_zone_center - sn_w/2, barcode_text_y), sn_code, font=side_font_barcode_text, fill=(0,0,0))
     
     # --- 区域 3: 底部 MADE IN CHINA (在当前局部表格内绝对居中) ---
-    made_text = sku_config.side_text['origin_text']
+    made_text = sku_config.side_text.get('origin_text', 'MADE IN CHINA')
     made_w = draw.textlength(made_text, font=side_font_bold)
     draw.text(( tw * 0.51 , th * 0.87 ), made_text, font=side_font_bold, fill=(0,0,0))
     

@@ -19,7 +19,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         return "Barberpub 对开盖箱唛样式 - 带公司Logo、SKU信息、条形码"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'box_number', 'img_line_drawing']
     
     def get_layout_config(self, sku_config):
         '''
@@ -108,7 +108,6 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             'icon_side_label_narrow': Image.open(res_base / '侧唛标签_窄.png').convert('RGBA'),
             'icon_slogan': Image.open(res_base / '正唛宣传语.png').convert('RGBA'),
             'icon_box_info': Image.open(res_base / '正唛多箱选择框.png').convert('RGBA'),
-            'img_line_drawing': Image.open(res_base / '侧唛线描图.png').convert('RGBA'),
         }
     
     def _load_fonts(self):
@@ -121,7 +120,6 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
 
         }
 
-    
     def generate_barberpub_left_panel(self, sku_config):
         """生成 Barberpub 对开盖样式的左侧面板"""
         canvas = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
@@ -347,7 +345,9 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             draw = ImageDraw.Draw(canvas)  # 重新创建draw对象，因为canvas被更新了
             
             # --- 区域 B: 线描图 (居左，高度为侧唛 2/3) ---
-            img_line_drawing = self.resources['img_line_drawing']
+            # img_line_drawing = self.resources['img_line_drawing']
+            img_line_drawing = sku_config.img_line_drawing
+            
             line_h = int(canvas_h * 0.66) # 侧唛的三分之二
             img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)
             # 居左粘贴，留出 margin
@@ -412,6 +412,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             # --- 区域 F: 右下侧标签框---
             # 使用宽侧唛
             icon_side_label = self.resources['icon_side_label_wide']
+             
             
             # 调整标签大小
             label_w_target = int(bbox_sku_w * 0.93)  # 标签宽度为SKU文字的93%
@@ -432,7 +433,9 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             """
             
             # --- 区域 B: 线描图（在网址下方间隔3cm，高度为canvas_h的46%）---
-            img_line_drawing = self.resources['img_line_drawing']
+            # img_line_drawing = self.resources['img_line_drawing']
+            img_line_drawing = sku_config.img_line_drawing
+            
             line_h = int(canvas_h * 0.46)  # 高度为画布高度的46%
             img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)
             

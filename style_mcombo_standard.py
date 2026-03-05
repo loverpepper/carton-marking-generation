@@ -102,7 +102,7 @@ class MComboStandardStyle(BoxMarkStyle):
     
     def _load_fonts(self):
         """加载字体路径"""
-        font_base = self.base_dir / 'assets' / 'MMcombo' / '样式一' / '箱唛字体'
+        font_base = self.base_dir / 'assets' / 'Mcombo' / '样式一' / '箱唛字体'
         self.font_paths = {
             'calibri_bold': str(font_base / 'calibri_blod.ttf'),
             'itc_demi': str(font_base / 'ITC Avant Garde Gothic LT Demi.ttf'),
