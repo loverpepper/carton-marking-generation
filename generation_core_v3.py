@@ -14,6 +14,8 @@ import style_barberpub_fulloverlap
 import style_exacme_fulloverlap
 import style_exacme_doubleopening
 import style_exacme_topandbottom_squaretrampoline
+import style_mcombo_vertical
+import style_New_market_GE_UK_FR
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -27,7 +29,10 @@ class SKUConfig:
     
     def __init__(self, sku_name, length_cm, width_cm, height_cm, 
                  style_name="mcombo_standard", 
-                 bottom_gb_h_cm=10, ppi=300, **style_params):
+                 bottom_gb_h_cm=10, ppi=300, rotate_side=False,
+                 company_name="NEWACME LLC", contact_info="www.mcombo.com / sale_uk@newacmellc.com",
+                 legal_data=None, legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=0, legal_3_6=0,
+                 show_fsc=0, show_sponge=0, UK=0, FR=0, GE=1, **style_params):
         """
         Args:
             sku_name: SKU 名称
@@ -58,7 +63,20 @@ class SKUConfig:
         self.h_px = int(height_cm * self.dpi)
         self.half_w_px = int(self.w_px / 2)
         self.bottom_gb_h_px = int(self.bottom_gb_h * self.dpi)
-        
+        self.company_name = company_name
+        self.contact_info = contact_info
+        self.legal_data = legal_data
+        self.legal_3_2 = legal_3_2
+        self.legal_3_3 = legal_3_3
+        self.legal_3_4 = legal_3_4
+        self.legal_3_5 = legal_3_5
+        self.legal_3_6 = legal_3_6
+        self.show_fsc = show_fsc
+        self.show_sponge = show_sponge
+        self.rotate_side = rotate_side
+        self.UK = UK
+        self.FR = FR
+        self.GE = GE
         # 存储样式特定参数
         for key, value in style_params.items():
             setattr(self, key, value)
@@ -153,30 +171,46 @@ if __name__ == "__main__":
 
     box_number = {
         'total_boxes': 3,
-        'current_box': 1
+        'current_box': 2
     }
-    
+
+    legal_info = {
+        "Product Name": "Lift Recliner",
+        "Model": "GE-6160-LC001BG-1",
+        "Batch Number": "08429381118265",
+        "Country Origin": "Made in China",
+        "Manufacturer": "TAIYUAN TEMARU ELECTRONICS TECHNOLOGY CO,.LTD",
+        "Manufacturer Address": "NO.201-01, Zhongchuang Space, Shanxi Temaru Cross-border Industrial Park, 2nd Floor, Customs Clearance Service Center, Taiyuan Wusu",
+        "Manufacturer E-mail": "cs@elegue.com"
+    }
+
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
         sku_name="6184-H812B-1",
-        length_cm=140.0,
-        width_cm=35.0,
-        height_cm=17.0,
-        style_name="exacme_topandbottom_squaretrampoline",  # 指定样式
+        length_cm=77.0,
+        width_cm=60.0,
+        height_cm=60.0,
+        style_name="mcombo",  # 指定样式
         ppi=150,
         
         color='Seafoam Green',
         product='Rectangle Trampoline',
         product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
-        size='(Medium-Wide)', # 可选参数，MCombo 标准样式的特定参数
+        size='', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
-        sponge_verified=True # 是否通过海绵测试, 可选参数, 有些样式会用到
+        sponge_verified=True,  # 是否通过海绵测试, 可选参数, 有些样式会用到
+        rotate_side=True, legal_data=legal_info,
+        company_name="NEWACME LLC",
+        contact_info="www.mcombo.com / sale_uk@newacmellc.com",
+        legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=1, legal_3_6=1,
+        show_fsc=1, show_sponge=1,
+        UK=0, FR=1, GE=0
     )
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_squaretrampoline", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
