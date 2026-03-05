@@ -16,7 +16,7 @@ class MComboStandardStyle(BoxMarkStyle):
         return "mcombo_vertical"
 
     def get_style_description(self):
-        return "MCombo 标准箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "MCombo 2箱3箱样式 - 带公司Logo、SKU信息、条形码"
 
     def get_required_params(self):
         return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'size', 'side_text', 'sku_name', 'box_number',
