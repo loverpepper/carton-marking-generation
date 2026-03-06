@@ -386,7 +386,116 @@ def draw_side_dynamic_bottom_bg(canvas, sku_config, icon_company, font_paths):
     pass
 
 
-def draw_side_dynamic_bottom_bg_1(canvas, sku_config, icon_company, font_paths):
+def draw_side_dynamic_bottom_bg_standard(canvas, sku_config, icon_company, font_paths):
+    draw = ImageDraw.Draw(canvas)
+    canvas_w, canvas_h = canvas.size
+    # === 如果启用旋转模式（侧唛在右侧垂直条） ===
+    bottom_bg_h = int(sku_config.bottom_gb_h * sku_config.dpi)
+    # --- 1. 计算基础尺寸 ---
+    h_left = int(sku_config.dpi * 10)  # 10 cm 高的黑色底框
+    h_right = int(h_left * 0.5)  # 右侧侧底框高度为左侧的50%
+
+    margin_1cm = int(1 * sku_config.dpi)
+    margin_2cm = int(2 * sku_config.dpi)
+    margin_3cm = int(3 * sku_config.dpi)
+    margin_4cm = int(4 * sku_config.dpi)
+    margin_6cm = int(6 * sku_config.dpi)
+    margin_8cm = int(8 * sku_config.dpi)
+    margin_10cm = int(10 * sku_config.dpi)
+
+    # --- 2. 处理公司信息 Logo 并确定右侧宽度 ---
+    # Logo 与底框上边缘平齐，高度设为 1.6 cm
+    icon_h = int(1.6 * sku_config.dpi)
+    icon_company_res = scale_by_height(icon_company, icon_h)
+    icon_company_w, _ = icon_company_res.size
+
+    # 侧唛SKU黑框部分长度与正唛设计相同，即左侧“弧头”总宽度 = 1cm + Logo宽 + 4cm。sku_config.l_px - 该值就是右侧底框宽度
+    left_section_w = sku_config.l_px - (margin_1cm + icon_company_w + margin_4cm)
+
+    # 边界检查：如果正唛太宽，需要限制 left_section_w 不超过侧唛宽度
+    # 确保至少留出过渡区域（10cm）和右侧一些空间
+    max_left_section_w = canvas_w - margin_10cm - margin_4cm  # 留出过渡区和右侧边距
+    if left_section_w > max_left_section_w:
+        left_section_w = max_left_section_w
+        print(f"警告：正唛宽度过大，侧唛SKU黑框已自动调整为 {left_section_w / sku_config.dpi:.1f}cm")
+
+    # --- 3. 绘制异形底框 (黑色) ---
+    # A. 左侧小矩形 + 右侧大矩形 + 中间连接部分
+    # 绘制贝塞尔曲线过渡部分
+
+    # --- a. 准备工作 ---
+    # 过渡区的起点 (x3, y3) 和 终点 (x4, y4)
+    x3, y3 = left_section_w, canvas_h - h_left
+    x4, y4 = min(left_section_w + margin_10cm, canvas_w - margin_1cm), canvas_h - h_right  # 确保 x4 不超过画布宽度
+
+    # --- b. 绘制左侧和右侧的方块 ---
+    # 左侧高块
+    draw.rectangle([0, canvas_h - h_left, x3, canvas_h], fill=(0, 0, 0))
+    # 右侧矮块
+    draw.rectangle([x4, canvas_h - h_right, canvas_w, canvas_h], fill=(0, 0, 0))
+
+    # --- c. 绘制丝滑过渡区 (关键：贝塞尔曲线模拟) ---
+    # 我们在 3 到 4 之间生成 20个点，连成一个平滑的填充区域
+    curve_points = []
+    for i in range(21):
+        t = i / 20
+        # 二次方贝塞尔公式：(1-t)^2*P0 + 2t(1-t)*P1 + t^2*P2
+        # 这里我们简化处理，让它形成一个 S 形
+        curr_x = x3 + (x4 - x3) * t
+        # 使用 smoothstep 函数使 y 的变化更平滑
+        t_smooth = t * t * (3 - 2 * t)
+        curr_y = y3 + (y4 - y3) * t_smooth
+        curve_points.append((curr_x, curr_y))
+
+    # 将曲线点与底部封口，形成封闭图形填充
+    curve_fill_path = curve_points + [(x4, canvas_h), (x3, canvas_h)]
+    draw.polygon(curve_fill_path, fill=(0, 0, 0))
+
+    # --- 4. 动态 SKU 文字 (带自动缩放) ---
+    # 可用宽度：从 margin_1cm + icon_company_w 到 canvas_w - margin_3cm
+    max_sku_w = left_section_w
+    max_sku_h = margin_8cm  # 文字高度不超过 8cm
+    # 初始字号应该根据高度动态计算（字号单位是像素）
+    current_sku_size = int(max_sku_h * 1.2)  # 初始为最大高度的1.2倍
+    min_sku_size = int(max_sku_h * 0.15)  # 最小字号为最大高度的15%
+
+    # 自动减小字号直到宽度和高度都满足要求
+    sku_font = None
+    while current_sku_size > min_sku_size:
+        test_font = ImageFont.truetype(font_paths['calibri_bold'], size=current_sku_size)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=test_font)
+        sw = bbox[2] - bbox[0]
+        sh = bbox[3] - bbox[1]
+
+        # 检查宽度和高度是否都符合要求
+        if sw <= max_sku_w and sh <= max_sku_h:
+            sku_font = test_font
+            sku_w, sku_h = sw, sh
+            break
+        current_sku_size -= 5
+
+    # 如果没有找到合适的字号，使用最小字号
+    if sku_font is None:
+        sku_font = ImageFont.truetype(font_paths['calibri_bold'], size=min_sku_size)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=sku_font)
+        sku_w = bbox[2] - bbox[0]
+        sku_h = bbox[3] - bbox[1]
+
+    # 绘制 SKU (在底框左侧区域中居中)
+    # 计算 SKU 可用区域的中心点
+    sku_area_left = margin_3cm
+    sku_area_right = left_section_w
+    sku_center_x = (sku_area_left + sku_area_right) // 2
+
+    # 底框高度区域的垂直中心，稍微向下偏移
+    offset_y = int(0.3 * sku_config.dpi)  # 向下偏移 0.3cm
+    sku_center_y = canvas_h - h_left // 2 + offset_y
+
+    # 使用 "mm" anchor 让文字的中心点对齐到区域中心
+    draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font, fill=(161, 142, 102), anchor="mm")
+    return x4
+
+def draw_side_dynamic_bottom_bg_vertical(canvas, sku_config, icon_company, font_paths):
     draw = ImageDraw.Draw(canvas)
     canvas_w, canvas_h = canvas.size
     # === 如果启用旋转模式（侧唛在右侧垂直条） ===
@@ -495,7 +604,6 @@ def draw_side_dynamic_bottom_bg_1(canvas, sku_config, icon_company, font_paths):
     draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font, fill=(161, 142, 102), anchor="mm")
     return x4
 
-
 def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
     """
     Mcombo 两种样式专用
@@ -578,9 +686,9 @@ def fill_sidepanel_text_1(icon_side_text_box_resized, sku_config, fonts_paths):
     # --- 区域 1: 右上角文字区 ---
     text_x_start = tw * 0.55
     side_weight_text = f'G.W./N.W.: {sku_config.side_text["gw_value"]} / {sku_config.side_text["nw_value"]} lbs'
+    side_dimention_text = f'BOX SIZE: {sku_config.l_in:.1f}\'\' x {sku_config.w_in:.1f}\'\' x {sku_config.h_in:.1f}\'\''
     draw.text((text_x_start, th * 0.044), side_weight_text, font=side_font_label, fill=(0, 0, 0))
-    draw.text((text_x_start, th * 0.214), sku_config.side_text['dimention_text'], font=side_font_label, fill=(0, 0, 0))
-
+    draw.text((text_x_start, th * 0.214), side_dimention_text, font=side_font_label, fill=(0, 0, 0))
     # --- 区域 2: 第二行条形码区 ---
     barcode_h_px = int(th * 0.35)
     barcode_y = th * 0.42

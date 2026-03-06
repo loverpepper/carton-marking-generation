@@ -15,7 +15,8 @@ import style_exacme_fulloverlap
 import style_exacme_doubleopening
 import style_exacme_topandbottom_squaretrampoline
 import style_mcombo_vertical
-import style_New_market_GE_UK_FR
+import style_New_market_GE_UK_FR_vertical
+import style_New_market_GE_UK_FR_standard
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -26,13 +27,14 @@ import style_New_market_GE_UK_FR
 
 class SKUConfig:
     """SKU 配置类 - 保持不变"""
-    
+    SUPPORTED_COUNTRIES = ['UK', 'FR', 'GE']
     def __init__(self, sku_name, length_cm, width_cm, height_cm, 
                  style_name="mcombo_standard", 
-                 bottom_gb_h_cm=10, ppi=300, rotate_side=False,
+                 bottom_gb_h_cm=10, ppi=300,
                  company_name="NEWACME LLC", contact_info="www.mcombo.com / sale_uk@newacmellc.com",
                  legal_data=None, legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=0, legal_3_6=0,
-                 show_fsc=0, show_sponge=0, UK=0, FR=0, GE=1, **style_params):
+                 show_fsc=0, show_sponge=0,
+                 UK=0, FR=0, GE=1, country=None, **style_params):
         """
         Args:
             sku_name: SKU 名称
@@ -73,10 +75,28 @@ class SKUConfig:
         self.legal_3_6 = legal_3_6
         self.show_fsc = show_fsc
         self.show_sponge = show_sponge
-        self.rotate_side = rotate_side
+
         self.UK = UK
         self.FR = FR
         self.GE = GE
+
+        # 先设置所有可能的国家开关为默认值0（或保留传入的旧参数）
+        # 但为了避免重复代码，采用如下逻辑：
+        if country is not None:
+            # 将国家名转为大写
+            country_upper = country.upper()
+            if country_upper not in self.SUPPORTED_COUNTRIES:
+                raise ValueError(f"Unsupported country: {country}. Supported: {', '.join(self.SUPPORTED_COUNTRIES)}")
+            # 将所有国家开关置0
+            for c in self.SUPPORTED_COUNTRIES:
+                setattr(self, c, 0)
+            # 将选中的国家开关置1
+            setattr(self, country_upper, 1)
+        else:
+            # 使用旧参数
+            self.UK = UK
+            self.FR = FR
+            self.GE = GE
         # 存储样式特定参数
         for key, value in style_params.items():
             setattr(self, key, value)
@@ -199,18 +219,18 @@ if __name__ == "__main__":
         size='', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
-        sponge_verified=True,  # 是否通过海绵测试, 可选参数, 有些样式会用到
-        rotate_side=False, legal_data=legal_info,
+        sponge_verified=True, show_fsc=True, # 是否通过海绵测试和FSC, 可选参数, 有些样式会用到
+        legal_data=legal_info,
         company_name="NEWACME LLC",
         contact_info="www.mcombo.com / sale_uk@newacmellc.com",
         legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=1, legal_3_6=1,
-        show_fsc=1, show_sponge=1,
-        UK=0, FR=1, GE=0
+
+        country="GE"
     )
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_vertical", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="new_market_vertical", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
