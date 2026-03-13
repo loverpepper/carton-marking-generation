@@ -14,6 +14,7 @@ import style_barberpub_fulloverlap
 import style_exacme_fulloverlap
 import style_exacme_doubleopening
 import style_exacme_topandbottom_squaretrampoline
+import style_exacme_topandbottom_doubleringandburiedtrampoline
 import style_mcombo_vertical
 import style_New_market_GE_UK_FR_vertical
 import style_New_market_GE_UK_FR_standard
@@ -34,7 +35,7 @@ class SKUConfig:
                  company_name="NEWACME LLC", contact_info="www.mcombo.com / sale_uk@newacmellc.com",
                  legal_data=None, legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=0, legal_3_6=0,
                  show_fsc=0, show_sponge=0,
-                 UK=0, FR=0, GE=1, country=None, **style_params):
+                 country=None, **style_params):
         """
         Args:
             sku_name: SKU 名称
@@ -76,9 +77,6 @@ class SKUConfig:
         self.show_fsc = show_fsc
         self.show_sponge = show_sponge
 
-        self.UK = UK
-        self.FR = FR
-        self.GE = GE
 
         # 先设置所有可能的国家开关为默认值0（或保留传入的旧参数）
         # 但为了避免重复代码，采用如下逻辑：
@@ -92,11 +90,7 @@ class SKUConfig:
                 setattr(self, c, 0)
             # 将选中的国家开关置1
             setattr(self, country_upper, 1)
-        else:
-            # 使用旧参数
-            self.UK = UK
-            self.FR = FR
-            self.GE = GE
+
         # 存储样式特定参数
         for key, value in style_params.items():
             setattr(self, key, value)
@@ -191,7 +185,7 @@ if __name__ == "__main__":
 
     box_number = {
         'total_boxes': 3,
-        'current_box': 2
+        'current_box': 1
     }
 
     legal_info = {
@@ -206,11 +200,11 @@ if __name__ == "__main__":
 
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6184-H812B-1",
-        length_cm=77.0,
-        width_cm=60.0,
-        height_cm=60.0,
-        style_name="mcombo",  # 指定样式
+        sku_name="6182-S08BL",
+        length_cm=94.5,
+        width_cm=16,
+        height_cm=40,
+        style_name="exacme_fulloverlap",  # 指定样式
         ppi=150,
         
         color='Seafoam Green',
@@ -219,18 +213,21 @@ if __name__ == "__main__":
         size='', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
-        sponge_verified=True, show_fsc=True, # 是否通过海绵测试和FSC, 可选参数, 有些样式会用到
+        sponge_verified=True, # 是否通过海绵测试, 可选参数, Mcombo 和 新市场 样式会用到
+
+        
+        # 江月加的新增参数
         legal_data=legal_info,
+        show_fsc=True, # 是否显示FSC标志，适用于新市场
         company_name="NEWACME LLC",
         contact_info="www.mcombo.com / sale_uk@newacmellc.com",
         legal_3_2=0, legal_3_3=0, legal_3_4=0, legal_3_5=1, legal_3_6=1,
-
         country="GE"
     )
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="new_market_vertical", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_fulloverlap", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

@@ -221,7 +221,7 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         
         icon_side_label_ori = self.resources['icon_side_label']
         # 这个面板就只放一个侧唛标签，调整它的大小，让它占满整个侧身, 所以就不单独放到一个函数里生成图片，也不用放到容器里了
-        icon_side_label = icon_side_label_ori.rotate(-90, expand=True) # 先旋转90度，让它变成长条形，方便后续调整宽度占满整个侧身
+        icon_side_label = icon_side_label_ori.rotate(0, expand=True) # 先旋转90度，让它变成长条形，方便后续调整宽度占满整个侧身
 
         # 把icon_side_label作为一个新的canvas
         draw = ImageDraw.Draw(icon_side_label)
