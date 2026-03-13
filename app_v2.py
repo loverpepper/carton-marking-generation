@@ -56,7 +56,24 @@ TEMPLATE_COLUMNS = [
     ("origin_text",     "原产地文字",   "MADE IN CHINA",          "选填。默认MADE IN CHINA"),
     ("total_boxes",     "总箱数",       3,                        "选填"),
     ("current_box",     "当前箱号",     1,                        "选填"),
-    ("sponge_verified", "海绵认证",     "否",                     "选填。填 是 或 否"),
+    ("sponge_verified",           "海绵认证",              "否",                                              "选填。填 是 或 否"),
+    ("country",                   "国家/地区",             "GE",                                              "选填。新市场样式用，可选: UK / FR / GE，留空忽略"),
+    ("company_name",              "公司名称",              "NEWACME LLC",                                     "选填。新市场样式用"),
+    ("contact_info",              "联系方式",              "www.mcombo.com / sale_uk@newacmellc.com",         "选填。新市场样式用"),
+    ("show_fsc",                  "显示FSC标志",           "否",                                              "选填。填 是 或 否"),
+    ("show_sponge",               "显示海绵认证标志",      "否",                                              "选填。填 是 或 否"),
+    ("legal_3_2",                 "法律条款3_2",           0,                                                 "选填。0或1"),
+    ("legal_3_3",                 "法律条款3_3",           0,                                                 "选填。0或1"),
+    ("legal_3_4",                 "法律条款3_4",           0,                                                 "选填。0或1"),
+    ("legal_3_5",                 "法律条款3_5",           1,                                                 "选填。0或1"),
+    ("legal_3_6",                 "法律条款3_6",           1,                                                 "选填。0或1"),
+    ("legal_product_name",        "法律标签-产品名",       "Lift Recliner",                                   "选填。新市场专用"),
+    ("legal_model",               "法律标签-型号",         "GE-6160-LC001BG-1",                               "选填。新市场专用"),
+    ("legal_batch_number",        "法律标签-批次号",       "08429381118265",                                  "选填。新市场专用"),
+    ("legal_country_origin",      "法律标签-原产国",       "Made in China",                                   "选填。新市场专用"),
+    ("legal_manufacturer",        "法律标签-制造商",       "TAIYUAN TEMARU ELECTRONICS TECHNOLOGY CO,.LTD",   "选填。新市场专用"),
+    ("legal_manufacturer_address","法律标签-制造商地址",   "NO.201-01, Zhongchuang Space...",                 "选填。新市场专用"),
+    ("legal_manufacturer_email",  "法律标签-制造商邮箱",   "cs@elegue.com",                                   "选填。新市场专用"),
 ]
 
 COL_KEYS = [c[0] for c in TEMPLATE_COLUMNS]
@@ -198,6 +215,40 @@ def row_to_skuconfig(row: dict, base_dir) -> SKUConfig:
             "current_box":  int(float(current_box))
         }
 
+    # ── 新市场专用参数 ──
+    country      = get("country")  # None 表示不启用国家开关
+    company_name = str(get("company_name", "NEWACME LLC")).strip()
+    contact_info = str(get("contact_info", "www.mcombo.com / sale_uk@newacmellc.com")).strip()
+
+    show_fsc    = str(get("show_fsc",    "否")).strip() in ("是", "True", "true", "1", "yes", "Yes")
+    show_sponge = str(get("show_sponge", "否")).strip() in ("是", "True", "true", "1", "yes", "Yes")
+
+    legal_3_2 = int(float(get("legal_3_2", 0) or 0))
+    legal_3_3 = int(float(get("legal_3_3", 0) or 0))
+    legal_3_4 = int(float(get("legal_3_4", 0) or 0))
+    legal_3_5 = int(float(get("legal_3_5", 0) or 0))
+    legal_3_6 = int(float(get("legal_3_6", 0) or 0))
+
+    # 组装 legal_data 字典
+    lp     = get("legal_product_name")
+    lm     = get("legal_model")
+    lb     = get("legal_batch_number")
+    lco    = get("legal_country_origin")
+    lmfr   = get("legal_manufacturer")
+    lmaddr = get("legal_manufacturer_address")
+    lmeml  = get("legal_manufacturer_email")
+    legal_data = None
+    if any(v is not None for v in [lp, lm, lb, lco, lmfr, lmaddr, lmeml]):
+        legal_data = {
+            "Product Name":         lp     or "",
+            "Model":                lm     or "",
+            "Batch Number":         lb     or "",
+            "Country Origin":       lco    or "",
+            "Manufacturer":         lmfr   or "",
+            "Manufacturer Address": lmaddr or "",
+            "Manufacturer E-mail":  lmeml  or "",
+        }
+
     return SKUConfig(
         sku_name=sku_name,
         length_cm=length_cm,
@@ -205,6 +256,17 @@ def row_to_skuconfig(row: dict, base_dir) -> SKUConfig:
         height_cm=height_cm,
         style_name=style_name,
         ppi=ppi,
+        company_name=company_name,
+        contact_info=contact_info,
+        legal_data=legal_data,
+        legal_3_2=legal_3_2,
+        legal_3_3=legal_3_3,
+        legal_3_4=legal_3_4,
+        legal_3_5=legal_3_5,
+        legal_3_6=legal_3_6,
+        show_fsc=show_fsc,
+        show_sponge=show_sponge,
+        country=country if country else None,
         **style_params
     )
 
@@ -373,6 +435,49 @@ with tab_single:
             style_params['img_line_drawing'] = Path.Path(tmp.name)
             st.image(line_drawing_file, caption="线描图预览", use_container_width=True)
 
+    # ── 新市场专用参数（折叠区块）──
+    st.markdown("---")
+    with st.expander("🌍 新市场专用参数（New Market 样式适用，其他样式可忽略）"):
+        nm_col1, nm_col2, nm_col3 = st.columns([1, 1, 1])
+
+        with nm_col1:
+            st.subheader("🏢 公司信息")
+            nm_country      = st.selectbox("市场/国家 country", options=["", "GE", "UK", "FR"], index=0,
+                                           help="选择目标市场，留空则不启用国家开关")
+            nm_company_name = st.text_input("公司名称 company_name", value="NEWACME LLC")
+            nm_contact_info = st.text_input("联系方式 contact_info",
+                                            value="www.mcombo.com / sale_uk@newacmellc.com")
+            nm_show_fsc    = st.selectbox("显示FSC标志 show_fsc",    options=["否", "是"], index=0) == "是"
+            nm_show_sponge = st.selectbox("显示海绵认证 show_sponge", options=["否", "是"], index=0) == "是"
+
+        with nm_col2:
+            st.subheader("📋 法律条款开关")
+            nm_legal_3_2 = int(st.checkbox("legal_3_2", value=False))
+            nm_legal_3_3 = int(st.checkbox("legal_3_3", value=False))
+            nm_legal_3_4 = int(st.checkbox("legal_3_4", value=False))
+            nm_legal_3_5 = int(st.checkbox("legal_3_5", value=True))
+            nm_legal_3_6 = int(st.checkbox("legal_3_6", value=True))
+
+        with nm_col3:
+            st.subheader("🏷️ 法律标签信息 legal_data")
+            nm_lp    = st.text_input("产品名 Product Name",           value="Lift Recliner")
+            nm_lm    = st.text_input("型号 Model",                     value="")
+            nm_lb    = st.text_input("批次号 Batch Number",            value="")
+            nm_lco   = st.text_input("原产国 Country Origin",          value="Made in China")
+            nm_lmfr  = st.text_input("制造商 Manufacturer",            value="")
+            nm_laddr = st.text_input("制造商地址 Manufacturer Address", value="")
+            nm_leml  = st.text_input("制造商邮箱 Manufacturer E-mail",  value="")
+
+    nm_legal_data = {
+        "Product Name":         nm_lp,
+        "Model":                nm_lm,
+        "Batch Number":         nm_lb,
+        "Country Origin":       nm_lco,
+        "Manufacturer":         nm_lmfr,
+        "Manufacturer Address": nm_laddr,
+        "Manufacturer E-mail":  nm_leml,
+    }
+
     # 箱号写入 style_params
     style_params['box_number'] = {
         'total_boxes': int(total_boxes),
@@ -409,6 +514,17 @@ with tab_single:
                     height_cm=height_cm,
                     style_name=selected_style,
                     ppi=ppi,
+                    company_name=nm_company_name,
+                    contact_info=nm_contact_info,
+                    legal_data=nm_legal_data,
+                    legal_3_2=nm_legal_3_2,
+                    legal_3_3=nm_legal_3_3,
+                    legal_3_4=nm_legal_3_4,
+                    legal_3_5=nm_legal_3_5,
+                    legal_3_6=nm_legal_3_6,
+                    show_fsc=nm_show_fsc,
+                    show_sponge=nm_show_sponge,
+                    country=nm_country if nm_country else None,
                     **style_params
                 )
                 base_dir = Path.Path(__file__).parent

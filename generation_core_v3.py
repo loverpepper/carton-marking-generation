@@ -216,7 +216,7 @@ if __name__ == "__main__":
         sponge_verified=True, # 是否通过海绵测试, 可选参数, Mcombo 和 新市场 样式会用到
 
         
-        # 江月加的新增参数
+        # 江月加的新增参数 适用于新市场样式，其他样式会忽略这些参数
         legal_data=legal_info,
         show_fsc=True, # 是否显示FSC标志，适用于新市场
         company_name="NEWACME LLC",
