@@ -133,7 +133,7 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         
         
         # 提取尺寸数据
-        match = re.search(r'P(\d{2})', sku_config.sku_name)
+        match = re.search(r'P-?(\d{2})', sku_config.sku_name)
 
         if match:
             # group(1) 代表获取括号里匹配到的那一部分
@@ -157,11 +157,11 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         )
         
         # 中间大块的产品全称，自动根据sku_config.product_fullname，字号占正身高度的 20%，并且自动居中
-        font_size_middle = int(canvas.height * 0.20) # 中间文字字号占正身高度的 20%
+        font_size_middle = int(canvas.height * 0.17) # 中间文字字号占正身高度的 17%
         font_middle = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_middle)
         
         # 生成中间垂直容器
-        spacing_middle = int(canvas.height * 0.10) # 中间文字行间距占正身高度的 10%
+        spacing_middle = int(canvas.height * 0.07) # 中间文字行间距占正身高度的 7%
         
         middle_column = engine.Column(
             justify='start', # 让每行文字在垂直方向上平均分布
@@ -407,10 +407,42 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         # 两个row中间的SKU_name
         text_sku_name = sku_config.sku_name
         font_sku_name_target_width = int(canvas.width * 0.50) # SKU_name占侧身宽度的 50%
-        font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width) # 获取最大字号
+        font_sku_name_target_height = int(canvas.height * 0.33) # SKU_name占侧身高度的 33%
+        font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width, font_sku_name_target_height) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
-        center_text = engine.Text(sku_config.sku_name, nudge_y = int(canvas.height * 0.17), font=font_sku_name)
+        center_text = engine.Text(sku_config.sku_name, font=font_sku_name)
         
+        font_sku_color_target_width = int(canvas.width * 0.40) # 颜色信息占侧身宽度的 40%
+        font_sku_color_target_height = int(canvas.height * 0.13) # 颜色信息占侧身高度的 13%
+        font_size_sku_color = general_functions.get_max_font_size(sku_config.color, self.font_paths['Arial Regular'], font_sku_color_target_width, font_sku_color_target_height) # 获取最大字号
+        font_sku_color = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_sku_color)
+        
+        border_radius = int(canvas.height * 0.09) # 黑框圆角半径占侧身高度的 9%
+        
+        center_color_text = engine.Text(sku_config.color,
+                                        font=font_sku_color,
+                                        color=sku_config.background_color,  # 白字
+                                        draw_background=True,
+                                        background_color='black',
+                                        border_radius = border_radius,
+                                        padding_x = int(canvas.width * 0.02),
+                                        padding_y = int(canvas.height * 0.03),
+                                        
+                                        )
+        
+        spacing_upper_col = int(canvas.height * 0.05) # SKU_name和颜色信息之间的垂直间距占侧身高度的 5%
+        
+        upper_col = engine.Column(
+            align='center',  # 水平居中
+            justify='start', # 垂直方向从上到下排列
+            spacing=spacing_upper_col, # 行间距
+            children=[
+                center_text,
+                center_color_text
+            ],
+            nudge_y = int(canvas.height * 0.09), # 整体向下微调
+            nudge_x = -int(canvas.width * 0.02) # 微调让它更靠近左边界
+        )
         
         ##################################bottom row##################################
         # 准备三个图片资源
@@ -418,8 +450,7 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         icon_top_attention = self.resources['icon_top_attention']
         icon_top_smallicons = self.resources['icon_top_smallicons']
         
-        # 加入底部容器
-        
+        # 加入底部容器的安全边距，避免贴边
         top_padding = int( 2 * sku_config.dpi )  # 顶部和左右安全距离，2厘米的像素值
         
         bottom_row = engine.Row(
@@ -443,7 +474,7 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
             align='center',               # 保证中间那个 center_block 在水平方向绝对居中
             padding=0,                    # 大面板也不要 padding，保证顶底贴边
             children=[
-                center_text,   # 中间SKU_name（自动居中，无需额外 padding）
+                upper_col,   
                 bottom_row     # 底部行 (左侧自带 padding，右侧贴边)
             ]
         )
@@ -475,7 +506,7 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         font_top_right = ImageFont.truetype(self.font_paths['Arial Black'], font_size_top_right)
 
         # 制作顶部的一整行 (魔法降临！)
-        match = re.search(r'P(\d{2})', sku_config.sku_name)
+        match = re.search(r'P-?(\d{2})', sku_config.sku_name)
 
         if match:
             # group(1) 代表获取括号里匹配到的那一部分
@@ -504,27 +535,27 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         
          ##################################top row##################################
         # 中间产品名称（自动居中）
-        font_size_bottom_middle = int(canvas.height * 0.31) # 字体大小占正身高度的 31%
+        font_size_bottom_middle = int(canvas.height * 0.23) # 字体大小占正身高度的 23%
         font_bottom_middle = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_bottom_middle)
-        font_size_bottom_right = int(canvas.height * 0.12) # 字体大小占正身高度的 12%
-        font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
+        # font_size_bottom_right = int(canvas.height * 0.10) # 字体大小占正身高度的 10%
+        # font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
         
+        fullname_lines = sku_config.product_fullname.split('\n')
+        center_text_upper = engine.Text(fullname_lines[0].upper(), font=font_bottom_middle)
+        center_text_lower = engine.Text(fullname_lines[1].upper() if len(fullname_lines) > 1 else '', font=font_bottom_middle)
         
-        center_text = engine.Text(f"{sku_config.product.upper()}", font=font_bottom_middle)
-        text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
+        # text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
         # 把 顶行、底行 全部塞进一个大 Row 里
-        spacing_text_row = int(canvas.height * 0.05) # 顶行和中间文字的间距占正身高度的 5%
+        spacing_text_row = int(canvas.height * 0.10) # 顶行和中间文字的间距占正身高度的 10%
         
-        text_row = engine.Row(
-            align = 'bottom',
-            justify = 'start',
-            # fixed_width= canvas.width,  # 锁死宽度
+        text_row = engine.Column(
+            align = 'center',
+            fixed_width= canvas.width,  # 锁死宽度
             padding_y = top_padding + int(canvas.height * 0.05), # 让文字离顶部有安全距离 + 一点额外的间距
             spacing = spacing_text_row,
             children = [
-                        engine.Spacer(width = text_color.width),
-                        center_text,
-                        text_color
+                        center_text_upper,
+                        center_text_lower,
                         ]         
         )
         

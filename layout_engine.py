@@ -143,7 +143,7 @@ class Column(Element):
         if justify == 'space-between' and fixed_height is None:
             raise ValueError("❌ 引擎排版错误: Column 容器使用 justify='space-between' 时，必须指定 fixed_height，否则无法计算剩余垂直空间！")
         
-        super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y)
+        super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y, **kwargs)
         
         self.children = children
         self.spacing = spacing
@@ -167,11 +167,14 @@ class Column(Element):
         
         for child in self.children:
             # --- 处理水平对齐 (居中、靠左、靠右) ---
+            # child 的视觉总宽 = 文字宽 + 左右 padding（背景框从 x-padding 到 x+width+padding）
+            
+            child_visual_width = child.width 
             offset_x = 0
             if self.align == 'center':
-                offset_x = (self.width - 2 * self.padding_x - child.width) // 2
+                offset_x = (self.width - 2 * self.padding_x - child_visual_width) // 2
             elif self.align == 'right':
-                offset_x = self.width - 2 * self.padding_x - child.width
+                offset_x = self.width - 2 * self.padding_x - child_visual_width
             elif self.align == 'left':
                 offset_x = 0
             
@@ -194,6 +197,7 @@ class Row(Element):
                  justify='start', # 新增：排列方式，默认靠左(start)，可选 'space-between'
                  fixed_width=None, # 新增：是否锁死宽度，如果锁死宽度则不根据孩子自动调整宽度，而是使用这个固定宽度
                  fixed_height=None, # 新增：是否锁死高度
+                 **kwargs
                  ):
         
         padding_x = padding if padding_x is None else padding_x
@@ -222,7 +226,7 @@ class Row(Element):
         if justify == 'space-between' and fixed_width is None:
             raise ValueError("❌ 引擎排版错误: Row 容器使用 justify='space-between' 时，必须指定 fixed_width，否则无法计算剩余水平空间！")
         
-        super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y)
+        super().__init__(width=width, height=height, padding=padding, padding_x=padding_x, padding_y=padding_y, **kwargs)
         
         self.children = children
         self.spacing = spacing
