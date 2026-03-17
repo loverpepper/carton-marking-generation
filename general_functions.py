@@ -277,6 +277,150 @@ def draw_dynamic_bottom_bg(canvas, sku_config, icon_company, icon_box_number, fo
     # 使用 "mm" anchor 让文字的中心点对齐到区域中心
     draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font, fill=(161, 142, 102), anchor="mm")
 
+
+def draw_dynamic_bottom_bg_move(canvas, sku_config, icon_company, icon_box_number, font_paths):
+    draw = ImageDraw.Draw(canvas)
+    canvas_w, canvas_h = canvas.size
+    bottom_bg_h = int(sku_config.bottom_gb_h * sku_config.dpi)
+    # --- 1. 计算基础尺寸 ---
+    h_right = int(10 * sku_config.dpi)  # 10 cm 高的黑色底框
+    h_left = int(0.5 * h_right)  # 左侧底框高度为右侧的50%
+    margin_1cm = int(1 * sku_config.dpi)
+    margin_2cm = int(2 * sku_config.dpi)
+    margin_3cm = int(3 * sku_config.dpi)
+    margin_4cm = int(4 * sku_config.dpi)
+    margin_6cm = int(6 * sku_config.dpi)
+    margin_8cm = int(8 * sku_config.dpi)
+    margin_10cm = int(10 * sku_config.dpi)
+
+    # SKU区域边距（减小黑边）
+    sku_margin = int(0.5 * sku_config.dpi)  # 0.5cm边距，原来是3cm
+    # 公司信息上移距离（增加上移）
+    company_offset_cm = 1.5  # 1.5cm，原来是0.3cm
+
+    # --- 2. 处理公司信息 Logo 并确定左侧宽度 ---
+    # Logo 与底框上边缘平齐，高度设为 1.6 cm
+    icon_h = int(1.6 * sku_config.dpi)
+    icon_company_res = scale_by_height(icon_company, icon_h)
+    icon_company_w, _ = icon_company_res.size
+
+    # 左侧"弧头"总宽度 = 1cm + Logo宽 + 4cm
+    left_section_w = margin_1cm + icon_company_w + margin_4cm
+
+    # --- 3. 计算SKU最小字号需求的空间 ---
+    # SKU最小字号180pt对应的像素值
+    min_sku_size_pt = 180
+    min_sku_size_px = int(min_sku_size_pt * sku_config.ppi / 72)
+
+    # 计算180pt字号下SKU文字的尺寸
+    min_sku_font = ImageFont.truetype(font_paths['calibri_bold'], size=min_sku_size_px)
+    min_sku_bbox = draw.textbbox((0, 0), sku_config.sku_name, font=min_sku_font)
+    min_sku_w = min_sku_bbox[2] - min_sku_bbox[0]
+    min_sku_h = min_sku_bbox[3] - min_sku_bbox[1]
+
+    # 计算需要的总空间：左侧矮块 + S弯(10cm) + SKU区域(3cm边距+文字宽度+3cm边距)
+    required_sku_area_width = sku_margin + min_sku_w + sku_margin
+    # SKU黑框左边界位置（从右往左算）
+    sku_block_left = canvas_w - required_sku_area_width
+    # 判断是否冲突：公司区域右边界是否超过SKU黑框左边界
+    space_is_enough = left_section_w <= sku_block_left
+
+    print(f"[正唛SKU调试] 画布宽度: {canvas_w}px ({canvas_w / sku_config.dpi:.1f}cm)")
+    print(f"[正唛SKU调试] 公司信息宽度: {left_section_w}px ({left_section_w / sku_config.dpi:.1f}cm)")
+    print(f"[正唛SKU调试] SKU区域左边界: {sku_block_left}px ({sku_block_left / sku_config.dpi:.1f}cm)")
+    print(f"[正唛SKU调试] 是否冲突: {not space_is_enough}, 公司右边界{'>' if not space_is_enough else '<='}SKU左边界")
+    # --- 4. 根据空间是否足够，决定布局方式 ---
+    if space_is_enough:
+        # ===== 空间足够：使用原有逻辑 =====
+        # 过渡区的起点 (x3, y3) 和 终点 (x4, y4)
+
+        # 公司信息位置：与底框上边缘平齐
+        icon_x = margin_1cm
+        icon_y = canvas_h - bottom_bg_h
+
+        # SKU可用区域
+        # 底部黑框：左侧矮块 + S弯 + 右侧高块
+        x3 = left_section_w - margin_10cm  # 左侧矮块右边界/S弯起点
+        x4 = left_section_w  # S弯终点/右侧高块左边界
+
+        # SKU在右侧高块区域内居中（使用更小的边距）
+        sku_area_left = x4 - 6*sku_margin
+        sku_area_right = canvas_w - sku_margin
+
+    else:
+        # ===== 空间不足：错开布局 =====
+        # ===== 空间不足：错开布局，SKU黑框向左扩展 =====
+        print(f"[正唛SKU调试] 使用错开布局，SKU黑框向左扩展")
+
+        # 公司信息上移到底框上方
+        icon_x = margin_1cm
+        icon_y = canvas_h - bottom_bg_h - icon_h - int(company_offset_cm * sku_config.dpi)
+        # SKU黑框向左扩展以容纳180pt文字
+        # 右侧高块左边界向左移动
+        x4 = canvas_w - sku_margin - min_sku_w - sku_margin
+        # 确保右侧高块不会太小（至少6cm）
+        min_x4 = margin_6cm + margin_10cm
+        if x4 < min_x4:
+            x4 = min_x4
+
+        # S弯起点
+        x3 = x4 - margin_10cm
+
+        # 确保x3不会小于0
+        if x3 < margin_1cm:
+            x3 = margin_1cm
+            x4 = x3 + margin_10cm
+            # 计算S弯的y坐标（与空间足够时相同）
+            # SKU在扩展后的右侧高块区域内
+        sku_area_left = x4 - 6 *sku_margin
+        sku_area_right = canvas_w - sku_margin
+
+    # S弯的y坐标
+    y3 = canvas_h - h_left
+    y4 = canvas_h - h_right
+
+    # --- 5. 绘制异形底框 (黑色) ---
+    # 左侧矮块
+    draw.rectangle([0, canvas_h - h_left, x3, canvas_h], fill=(0, 0, 0))
+    # 右侧高块
+    draw.rectangle([x4, canvas_h - h_right, canvas_w, canvas_h], fill=(0, 0, 0))
+
+    # 绘制丝滑过渡区 (关键：贝塞尔曲线模拟)
+    curve_points = []
+    for i in range(21):
+        t = i / 20
+        curr_x = x3 + (x4 - x3) * t
+        t_smooth = t * t * (3 - 2 * t)
+        curr_y = y3 + (y4 - y3) * t_smooth
+        curve_points.append((curr_x, curr_y))
+
+    curve_fill_path = curve_points + [(x4, canvas_h), (x3, canvas_h)]
+    draw.polygon(curve_fill_path, fill=(0, 0, 0))
+
+    # B. 粘贴公司信息 Logo
+    canvas.paste(icon_company_res, (icon_x, icon_y), mask=icon_company_res)
+
+    # C. 粘贴左下角箱号信息
+    icon_box_h = int(h_right * 1 / 4)  # 高度为底框高度的25%
+    icon_box_res = scale_by_height(icon_box_number, icon_box_h)
+    icon_box_w, icon_box_h = icon_box_res.size
+    icon_box_x = margin_1cm
+    icon_box_y = int(canvas_h - h_left + (h_left - icon_box_h) // 2)  # 垂直居中
+    canvas.paste(icon_box_res, (icon_box_x, icon_box_y), mask=icon_box_res)
+
+    # --- 6. 绘制 SKU 文字 ---
+    # 计算 SKU 区域的中心点
+    sku_center_x = (sku_area_left + sku_area_right) // 2
+
+    # 底框高度区域的垂直中心，稍微向下偏移
+    offset_y = int(0.3 * sku_config.dpi)  # 向下偏移 0.3cm
+    sku_center_y = canvas_h - h_right // 2 + offset_y
+
+    # 使用 "mm" anchor 让文字的中心点对齐到区域中心
+    draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=min_sku_font,
+              fill=(161, 142, 102), anchor="mm")
+    print(f"[正唛SKU调试] 最终SKU字号: {min_sku_size_pt}pt, 区域: {sku_area_left}-{sku_area_right}px")
+
     
     
 def draw_side_dynamic_bottom_bg(canvas, sku_config, icon_company, font_paths):
@@ -499,6 +643,120 @@ def draw_side_dynamic_bottom_bg_standard(canvas, sku_config, icon_company, font_
     draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font, fill=(161, 142, 102), anchor="mm")
     return x4
 
+def draw_side_dynamic_bottom_bg_standard_move(canvas, sku_config, icon_company, font_paths):
+    draw = ImageDraw.Draw(canvas)
+    canvas_w, canvas_h = canvas.size
+
+    # === 非旋转模式 ===
+    bottom_bg_h = int(sku_config.bottom_gb_h * sku_config.dpi)
+    # --- 1. 计算基础尺寸 ---
+    h_left = int(sku_config.dpi * sku_config.bottom_gb_h)  # 10 cm 高的黑色底框
+    h_right = int(h_left * 0.5)  # 右侧矮块高度为左侧的50%
+
+    margin_1cm = int(1 * sku_config.dpi)
+    margin_2cm = int(2 * sku_config.dpi)
+    margin_3cm = int(3 * sku_config.dpi)
+    margin_4cm = int(4 * sku_config.dpi)
+    margin_6cm = int(6 * sku_config.dpi)
+    margin_8cm = int(8 * sku_config.dpi)
+    margin_10cm = int(10 * sku_config.dpi)
+
+    # SKU区域边距
+    sku_margin = int(0.5 * sku_config.dpi)  # 0.5cm边距
+
+    # --- 2. 动态计算SKU字号和黑框宽度 ---
+    # 最大可用宽度（留出S弯10cm + 右侧矮块4cm）
+    max_sku_block_width = canvas_w - margin_10cm - margin_4cm
+    max_sku_h = margin_8cm  # 文字高度不超过8cm
+
+    # 从180pt开始尝试，逐渐减小直到宽度合适
+    min_sku_size_pt = 180
+    current_sku_size_px = int(min_sku_size_pt * sku_config.ppi / 72)
+    min_sku_size_px = int(max_sku_h * 0.15)  # 最小字号
+
+    sku_font = None
+    sku_w = 0
+    while current_sku_size_px >= min_sku_size_px:
+        test_font = ImageFont.truetype(font_paths['calibri_bold'], size=current_sku_size_px)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=test_font)
+        sw = bbox[2] - bbox[0]
+        sh = bbox[3] - bbox[1]
+
+        # 检查宽度和高度是否都满足
+        if sw <= max_sku_block_width - 2 * sku_margin and sh <= max_sku_h:
+            sku_font = test_font
+            sku_w = sw
+            sku_h = sh
+            min_sku_size_pt = int(current_sku_size_px * 72 / sku_config.ppi)  # 记录实际使用的字号
+            break
+        current_sku_size_px -= 5
+
+    # 如果都没找到，使用最小字号
+    if sku_font is None:
+        sku_font = ImageFont.truetype(font_paths['calibri_bold'], size=min_sku_size_px)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=sku_font)
+        sku_w = bbox[2] - bbox[0]
+        sku_h = bbox[3] - bbox[1]
+        min_sku_size_pt = int(min_sku_size_px * 72 / sku_config.ppi)
+
+    # --- 3. 根据SKU实际宽度计算黑框宽度 ---
+    # 黑框宽度 = 文字宽度 + 边距(0.5cm+0.5cm)
+    sku_block_width = sku_w + 2 * sku_margin
+
+    # 限制黑框宽度范围
+    if sku_block_width > max_sku_block_width:
+        sku_block_width = max_sku_block_width
+    if sku_block_width < margin_6cm:  # 最小6cm
+        sku_block_width = margin_6cm
+
+    # 计算S弯位置
+    x3 = sku_block_width  # 左侧高块右边界/S弯起点
+    x4 = x3 + margin_10cm  # S弯终点/右侧矮块左边界
+
+    # 确保不超出画布
+    if x4 > canvas_w - margin_1cm:
+        x4 = canvas_w - margin_1cm
+        x3 = x4 - margin_10cm
+        sku_block_width = x3
+
+    print(f"[侧唛SKU调试-普通] 画布宽度: {canvas_w}px ({canvas_w / sku_config.dpi:.1f}cm)")
+    print(f"[侧唛SKU调试-普通] SKU文字宽度: {sku_w / sku_config.dpi:.1f}cm, 字号: {min_sku_size_pt}pt")
+    print(f"[侧唛SKU调试-普通] 黑框宽度: {sku_block_width / sku_config.dpi:.1f}cm")
+
+    # S弯的y坐标
+    y3 = canvas_h - h_left
+    y4 = canvas_h - h_right
+
+    # --- 4. 绘制异形底框 (黑色) ---
+    # 左侧高块
+    draw.rectangle([0, canvas_h - h_left, x3, canvas_h], fill=(0, 0, 0))
+    # 右侧矮块
+    draw.rectangle([x4, canvas_h - h_right, canvas_w, canvas_h], fill=(0, 0, 0))
+
+    # 绘制丝滑过渡区 (S弯)
+    curve_points = []
+    for i in range(21):
+        t = i / 20
+        curr_x = x3 + (x4 - x3) * t
+        t_smooth = t * t * (3 - 2 * t)
+        curr_y = y3 + (y4 - y3) * t_smooth
+        curve_points.append((curr_x, curr_y))
+
+    curve_fill_path = curve_points + [(x4, canvas_h), (x3, canvas_h)]
+    draw.polygon(curve_fill_path, fill=(0, 0, 0))
+
+    # --- 5. 绘制 SKU 文字 (180pt，在左侧高块中居中) ---
+    sku_area_left = sku_margin
+    sku_area_right = x3 +6* sku_margin
+    sku_center_x = (sku_area_left + sku_area_right) // 2
+    offset_y = int(0.3 * sku_config.dpi)
+    sku_center_y = canvas_h - h_left // 2 + offset_y
+
+    draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font,
+              fill=(161, 142, 102), anchor="mm")
+    print(f"[侧唛SKU调试-普通] 最终SKU字号: {min_sku_size_pt}pt, 区域: {sku_area_left}-{sku_area_right}px")
+    return x4
+
 def draw_side_dynamic_bottom_bg_vertical(canvas, sku_config, icon_company, font_paths):
     draw = ImageDraw.Draw(canvas)
     canvas_w, canvas_h = canvas.size
@@ -606,6 +864,119 @@ def draw_side_dynamic_bottom_bg_vertical(canvas, sku_config, icon_company, font_
 
     # 使用 "mm" anchor 让文字的中心点对齐到区域中心
     draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font, fill=(161, 142, 102), anchor="mm")
+    return x4
+
+def draw_side_dynamic_bottom_bg_vertical_move(canvas, sku_config, icon_company, font_paths):
+    draw = ImageDraw.Draw(canvas)
+    canvas_w, canvas_h = canvas.size
+
+    bottom_bg_h = int(sku_config.bottom_gb_h * sku_config.dpi)
+    # --- 1. 计算基础尺寸 ---
+    h_left = int(sku_config.dpi * 8)  # 8 cm 高的黑色底框
+    h_right = int(h_left * 0.5)  # 右侧矮块高度为左侧的50%
+
+    margin_1cm = int(1 * sku_config.dpi)
+    margin_2cm = int(2 * sku_config.dpi)
+    margin_3cm = int(3 * sku_config.dpi)
+    margin_4cm = int(4 * sku_config.dpi)
+    margin_6cm = int(6 * sku_config.dpi)
+    margin_8cm = int(8 * sku_config.dpi)
+    margin_10cm = int(10 * sku_config.dpi)
+
+    # SKU区域边距
+    sku_margin = int(0.5 * sku_config.dpi)  # 0.5cm边距
+
+    # --- 2. 动态计算SKU字号和黑框宽度 ---
+    # 最大可用宽度（留出S弯10cm + 右侧矮块4cm）
+    max_sku_block_width = canvas_w - margin_10cm - margin_4cm
+    max_sku_h = margin_8cm  # 文字高度不超过8cm
+
+    # 从160pt开始尝试，逐渐减小直到宽度合适
+    min_sku_size_pt = 160
+    current_sku_size_px = int(min_sku_size_pt * sku_config.ppi / 72)
+    min_sku_size_px = int(max_sku_h * 0.15)  # 最小字号
+
+    sku_font = None
+    sku_w = 0
+    while current_sku_size_px >= min_sku_size_px:
+        test_font = ImageFont.truetype(font_paths['calibri_bold'], size=current_sku_size_px)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=test_font)
+        sw = bbox[2] - bbox[0]
+        sh = bbox[3] - bbox[1]
+
+        # 检查宽度和高度是否都满足
+        if sw <= max_sku_block_width - 2 * sku_margin and sh <= max_sku_h:
+            sku_font = test_font
+            sku_w = sw
+            sku_h = sh
+            min_sku_size_pt = int(current_sku_size_px * 72 / sku_config.ppi)  # 记录实际使用的字号
+            break
+        current_sku_size_px -= 5
+
+    # 如果都没找到，使用最小字号
+    if sku_font is None:
+        sku_font = ImageFont.truetype(font_paths['calibri_bold'], size=min_sku_size_px)
+        bbox = draw.textbbox((0, 0), sku_config.sku_name, font=sku_font)
+        sku_w = bbox[2] - bbox[0]
+        sku_h = bbox[3] - bbox[1]
+        min_sku_size_pt = int(min_sku_size_px * 72 / sku_config.ppi)
+
+    # --- 3. 根据SKU实际宽度计算黑框宽度 ---
+    # 黑框宽度 = 文字宽度 + 边距(0.5cm+0.5cm)
+    sku_block_width = sku_w + 2 * sku_margin
+
+    # 限制黑框宽度范围
+    if sku_block_width > max_sku_block_width:
+        sku_block_width = max_sku_block_width
+    if sku_block_width < margin_6cm:  # 最小6cm
+        sku_block_width = margin_6cm
+
+    # 计算S弯位置
+    x3 = sku_block_width  # 左侧高块右边界/S弯起点
+    x4 = x3 + margin_10cm  # S弯终点/右侧矮块左边界
+
+    # 确保不超出画布
+    if x4 > canvas_w - margin_1cm:
+        x4 = canvas_w - margin_1cm
+        x3 = x4 - margin_10cm
+        sku_block_width = x3
+
+    print(f"[侧唛SKU调试-旋转] 画布宽度: {canvas_w}px ({canvas_w / sku_config.dpi:.1f}cm)")
+    print(f"[侧唛SKU调试-旋转] SKU文字宽度: {sku_w / sku_config.dpi:.1f}cm, 字号: {min_sku_size_pt}pt")
+    print(f"[侧唛SKU调试-旋转] 黑框宽度: {sku_block_width / sku_config.dpi:.1f}cm")
+
+    # S弯的y坐标
+    y3 = canvas_h - h_left
+    y4 = canvas_h - h_right
+
+    # --- 4. 绘制异形底框 (黑色) ---
+    # 左侧高块
+    draw.rectangle([0, canvas_h - h_left, x3, canvas_h], fill=(0, 0, 0))
+    # 右侧矮块
+    draw.rectangle([x4, canvas_h - h_right, canvas_w, canvas_h], fill=(0, 0, 0))
+
+    # 绘制丝滑过渡区 (S弯)
+    curve_points = []
+    for i in range(21):
+        t = i / 20
+        curr_x = x3 + (x4 - x3) * t
+        t_smooth = t * t * (3 - 2 * t)
+        curr_y = y3 + (y4 - y3) * t_smooth
+        curve_points.append((curr_x, curr_y))
+
+    curve_fill_path = curve_points + [(x4, canvas_h), (x3, canvas_h)]
+    draw.polygon(curve_fill_path, fill=(0, 0, 0))
+
+    # --- 5. 绘制 SKU 文字 (180pt，在左侧高块中居中) ---
+    sku_area_left = sku_margin
+    sku_area_right = x3 +6* sku_margin
+    sku_center_x = (sku_area_left + sku_area_right) // 2
+    offset_y = int(0.3 * sku_config.dpi)
+    sku_center_y = canvas_h - h_left // 2 + offset_y
+
+    draw.text((sku_center_x, sku_center_y), sku_config.sku_name, font=sku_font,
+              fill=(161, 142, 102), anchor="mm")
+    print(f"[侧唛SKU调试-旋转] 最终SKU字号: {min_sku_size_pt}pt, 区域: {sku_area_left}-{sku_area_right}px")
     return x4
 
 def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):

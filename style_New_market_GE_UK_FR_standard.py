@@ -281,7 +281,7 @@ class MComboStandardStyle(BoxMarkStyle):
             self.resources
         )
         icon_box_number = self.resources[f"icon_box_number_{sku_config.box_number['current_box']}"]
-        general_functions.draw_dynamic_bottom_bg(canvas, sku_config, icon_company, icon_box_number, self.font_paths)
+        general_functions.draw_dynamic_bottom_bg_move(canvas, sku_config, icon_company, icon_box_number, self.font_paths)
 
         # 写入右上角颜色信息
         color_font = fonts['color_font']
@@ -388,7 +388,7 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_company = general_functions.draw_dynamic_company_brand(
             sku_config, sku_config.company_name, sku_config.contact_info, font_paths, self.resources
         )
-        safe_x_start = general_functions.draw_side_dynamic_bottom_bg_standard(canvas, sku_config, icon_company, font_paths)
+        safe_x_start = general_functions.draw_side_dynamic_bottom_bg_standard_move(canvas, sku_config, icon_company, font_paths)
 
         # 3. 绘制侧唛 Logo (右上角固定位置)
         # icon_side_logo = self.resources['icon_side_logo']
