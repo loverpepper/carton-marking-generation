@@ -16,10 +16,10 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         return "exacme_topandbottom_doubleringandburiedtrampoline"
 
     def get_style_description(self):
-        return "Exacme 双圈和埋地天地盖样式 - 带线描图、底部警告栏"
+        return "Exacme 双圈和埋地蹦床天地盖样式"
 
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'color', 'side_text', 'sku_name', 'box_number']
 
     def get_layout_config(self, sku_config):
         '''
@@ -414,7 +414,7 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         # 把绘制好的横向 icon_side_label 转回竖向，再居中贴到画布上
         target_width  = int(sku_config.w_px * 0.59)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
+        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         canvas_short_left = canvas.rotate(-90, expand=True) # 最后再旋转回去，得到正确方向的侧身面板

@@ -18,10 +18,10 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         return "exacme_doubleopening"
     
     def get_style_description(self):
-        return "Exacme 对开盖箱唛样式 - 带公司Logo、品牌Logo、SKU信息、颜色信息、重量信息、条形码等，适用于对开盖箱型。"
+        return "Exacme 对开盖箱唛样式"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'product_fullname']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'product', 'product_fullname', 'side_text', 'sku_name']
     
     def get_layout_config(self, sku_config):
         '''

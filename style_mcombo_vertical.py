@@ -16,7 +16,7 @@ class MComboStandardStyle(BoxMarkStyle):
         return "mcombo_vertical"
 
     def get_style_description(self):
-        return "MCombo 2箱3箱样式 - 带公司Logo、SKU信息、条形码"
+        return "MCombo 第二箱三箱 箱唛样式 "
 
     def get_required_params(self):
         return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'size', 'side_text', 'sku_name', 'box_number',
@@ -325,7 +325,7 @@ class MComboStandardStyle(BoxMarkStyle):
         self.bottom_gb_h_px1 = int(8 * sku_config.dpi)
 
 
-        general_functions.draw_side_dynamic_bottom_bg_1(
+        general_functions.draw_side_dynamic_bottom_bg_vertical(
             canvas, sku_config, self.resources['icon_company'], self.font_paths)
 
         # 放置侧唛标签框

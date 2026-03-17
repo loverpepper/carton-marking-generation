@@ -433,7 +433,7 @@ with tab_single:
             tmp.write(line_drawing_file.read())
             tmp.close()
             style_params['img_line_drawing'] = Path.Path(tmp.name)
-            st.image(line_drawing_file, caption="线描图预览", use_container_width=True)
+            st.image(line_drawing_file, caption="线描图预览", width='stretch')
 
     # ── 新市场专用参数（折叠区块）──
     st.markdown("---")
@@ -557,7 +557,7 @@ with tab_single:
     if st.session_state.generated_image:
         st.markdown("---")
         st.header("🖼️ 预览")
-        st.image(st.session_state.generated_image, use_container_width=True)
+        st.image(st.session_state.generated_image, width='stretch')
         if st.session_state.pdf_bytes:
             st.info("💡 提示：预览图已生成，点击上方'下载 PDF'按钮保存文件")
 
@@ -651,7 +651,7 @@ with tab_batch:
                 df_edited = st.data_editor(
                     edit_df,
                     column_config=col_cfg,
-                    use_container_width=True,
+                    width='stretch',
                     height=280,
                     num_rows="dynamic",
                     key="batch_editor"
@@ -752,7 +752,7 @@ with tab_batch:
                         {"SKU": sku, "状态": msg}
                         for sku, ok, msg in st.session_state.batch_results
                     ]
-                    st.dataframe(pd.DataFrame(result_data), use_container_width=True)
+                    st.dataframe(pd.DataFrame(result_data), width='stretch')
 
         except Exception as e:
             st.error(f"❌ 读取 Excel 出错：{str(e)}")

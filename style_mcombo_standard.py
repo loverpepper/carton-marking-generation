@@ -16,7 +16,7 @@ class MComboStandardStyle(BoxMarkStyle):
         return "mcombo_standard"
     
     def get_style_description(self):
-        return "MCombo 标准箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "MCombo 第一箱 箱唛样式"
     
     def get_required_params(self):
         return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'size', 'side_text', 'sku_name', 'box_number', 'sponge_verified']
@@ -56,13 +56,17 @@ class MComboStandardStyle(BoxMarkStyle):
         """定义每个区域应该粘贴哪个面板"""
         return {
             "flap_top_front1": "left_up",
+            "flap_top_side1": "blank",
             "flap_top_front2": "right_up",
+            "flap_top_side2": "blank",
             "panel_front1": "front",
             "panel_side1": "side",
             "panel_front2": "front",
             "panel_side2": "side",
             "flap_btm_front1": "left_down",
+            "flap_btm_side1": "blank",
             "flap_btm_front2": "right_down",
+            "flap_btm_side2": "blank",
         }
     
     def generate_all_panels(self, sku_config):
@@ -71,6 +75,8 @@ class MComboStandardStyle(BoxMarkStyle):
         canvas_right_up, canvas_right_down = self.generate_right_panel(sku_config)
         canvas_front = self.generate_front_panel(sku_config)
         canvas_side = self.generate_side_panel(sku_config)
+        canvas_blank = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.half_w_px), sku_config.background_color)
+        
         
         return {
             "left_up": canvas_left_up,
@@ -79,6 +85,7 @@ class MComboStandardStyle(BoxMarkStyle):
             "right_down": canvas_right_down,
             "front": canvas_front,
             "side": canvas_side,
+            "blank": canvas_blank
         }
     
     def _load_resources(self):

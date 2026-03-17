@@ -19,10 +19,10 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         return "exacme_topandbottom_squaretrampoline"
     
     def get_style_description(self):
-        return "Exacme 方形蹦床天地盖箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "Exacme 方形蹦床天地盖箱唛样式"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'side_text', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'product', 'side_text', 'sku_name', 'box_number']
     
     def get_preview_images(self):
         """
@@ -774,6 +774,6 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         barcode_block.layout(x=560, y=195) # 先布局，获取整体宽高
         barcode_block.render(draw) # 再渲染
         
-        icon_side_label.show()
+        # icon_side_label.show()
         
         return icon_side_label

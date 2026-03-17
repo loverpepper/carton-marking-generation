@@ -16,10 +16,10 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
         return "barberpub_doubleopening"
     
     def get_style_description(self):
-        return "Barberpub 对开盖箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "Barberpub 对开盖箱唛样式"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'box_number', 'img_line_drawing']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'product', 'side_text', 'sku_name', 'box_number', 'img_line_drawing']
     
     def get_layout_config(self, sku_config):
         '''

@@ -19,10 +19,10 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         return "exacme_fulloverlap"
     
     def get_style_description(self):
-        return "Exacme 全搭盖箱唛样式 - 带公司Logo、品牌Logo、SKU信息、颜色信息、重量信息、条形码"
+        return "Exacme 全搭盖箱唛样式"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'color_mode', 'background_color', 'product', 'side_text', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'side_text', 'sku_name']
     
     def get_layout_config(self, sku_config):
         '''
@@ -377,7 +377,7 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         # 把绘制好的横向 icon_side_label 转回竖向，再居中贴到画布上
         target_width  = int(sku_config.h_px * 0.78)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
+        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         canvas = canvas.rotate(90, expand=True) # 最后再旋转回去，得到正确方向的侧身面板
@@ -428,9 +428,10 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         # 两个row中间的SKU_name
         text_sku_name = sku_config.sku_name
         font_sku_name_target_width = int(canvas.width * 0.50) # SKU_name占侧身宽度的 50%
-        font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width) # 获取最大字号
+        font_sku_name_target_height = int(canvas.height * 0.30) # SKU_name占侧身高度的 30%
+        font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width, font_sku_name_target_height) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
-        center_text = engine.Text(sku_config.sku_name, nudge_y = -int(canvas.height * 0.03), font=font_sku_name)
+        center_text = engine.Text(sku_config.sku_name, nudge_y = -int(canvas.height * 0.08), font=font_sku_name)
         
         
         ##################################bottom row##################################

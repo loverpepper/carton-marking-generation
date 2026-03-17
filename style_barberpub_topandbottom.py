@@ -17,10 +17,10 @@ class BarberpubTopAndBottomStyle(BoxMarkStyle):
         return "barberpub_topandbottom"
     
     def get_style_description(self):
-        return "Barberpub 天地盖箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "Barberpub 天地盖箱唛样式"
     
     def get_required_params(self):
-        return ['length_cm', 'width_cm', 'height_cm', 'color', 'origin', 'product', 'side_text', 'sku_name', 'box_number']
+        return ['length_cm', 'width_cm', 'height_cm', 'ppi', 'color', 'product', 'side_text', 'sku_name', 'box_number']
     
     def get_layout_config(self, sku_config):
         '''

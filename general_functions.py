@@ -45,12 +45,16 @@ def paste_center_with_height(canvas, icon, height_cm, dpi):
 
 def scale_by_height(image, target_height):
     """根据目标高度等比例缩放图片"""
+    if not isinstance(image, Image.Image):
+        image = Image.open(image).convert("RGBA")
     w, h = image.size
     target_width = int(w * (target_height / h))
     return image.resize((target_width, target_height), Image.Resampling.LANCZOS)
 
 def scale_by_width(image, target_width):
     """根据目标宽度等比例缩放图片"""
+    if not isinstance(image, Image.Image):
+        image = Image.open(image).convert("RGBA")
     w, h = image.size
     target_height = int(h * (target_width / w))
     return image.resize((target_width, target_height), Image.Resampling.LANCZOS)

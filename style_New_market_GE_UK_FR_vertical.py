@@ -16,7 +16,7 @@ class MComboStandardStyle(BoxMarkStyle):
         return "new_market_vertical"
 
     def get_style_description(self):
-        return "new_market 侧唛垂直箱唛样式 - 带公司Logo、SKU信息、条形码"
+        return "new_market 侧唛垂直箱唛样式"
 
     def get_required_params(self):
         return ['length_cm', 'width_cm', 'height_cm', 'color', 'product', 'size', 'side_text', 'sku_name', 'box_number',
