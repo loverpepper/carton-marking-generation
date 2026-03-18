@@ -12,6 +12,7 @@ from layout_engine import Element, Row, Image as ImageElement
 class MComboStandardStyle(BoxMarkStyle):
     """MCombo 标准箱唛样式（原始样式）"""
 
+
     def get_style_name(self):
         return "new_market_standard"
 
