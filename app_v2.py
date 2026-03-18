@@ -281,6 +281,8 @@ if 'batch_zip_bytes' not in st.session_state:
     st.session_state.batch_zip_bytes = None
 if 'batch_results' not in st.session_state:
     st.session_state.batch_results = []   # list of (sku_name, ok, msg)
+if 'last_gen_info' not in st.session_state:
+    st.session_state.last_gen_info = None
 
 # 页面标题
 st.title("📦 Mcombo·Barberpub·Exacme·新市场 箱唛生成器 V3")
@@ -448,7 +450,7 @@ with tab_single:
             nm_contact_info = st.text_input("联系方式 contact_info",
                                             value="www.mcombo.com / sale_uk@newacmellc.com")
             nm_show_fsc    = st.selectbox("显示FSC标志 show_fsc",    options=["否", "是"], index=0) == "是"
-            # nm_show_sponge = st.selectbox("显示海绵认证 show_sponge", options=["否", "是"], index=0) == "是"
+            nm_show_sponge = st.selectbox("显示海绵认证 show_sponge", options=["否", "是"], index=0) == "是"
 
         with nm_col2:
             st.subheader("📋 法律条款开关")
@@ -523,7 +525,7 @@ with tab_single:
                     legal_3_5=nm_legal_3_5,
                     legal_3_6=nm_legal_3_6,
                     show_fsc=nm_show_fsc,
-                    # show_sponge=nm_show_sponge,
+                    show_sponge=nm_show_sponge,
                     country=nm_country if nm_country else None,
                     **style_params
                 )
@@ -546,8 +548,8 @@ with tab_single:
 
                 st.session_state.generated_image = preview_image
                 total_width, total_height = canvas.size
-                st.success(f"✅ 箱唛生成成功！（样式: {selected_style}）")
-                st.info(f"📐 PDF 尺寸: {total_width}x{total_height}px | 🎨 分辨率: {ppi} PPI")
+                st.session_state.last_gen_info = (style_descriptions[selected_style], total_width, total_height, ppi)
+                st.rerun()
 
             except Exception as e:
                 st.error(f"❌ 生成失败: {str(e)}")
@@ -556,6 +558,10 @@ with tab_single:
     # 预览区
     if st.session_state.generated_image:
         st.markdown("---")
+        if 'last_gen_info' in st.session_state:
+            _sty, _tw, _th, _ppi = st.session_state.last_gen_info
+            st.success(f"✅ 箱唛生成成功！（样式: {_sty}）")
+            st.info(f"📐 PDF 尺寸: {_tw}x{_th}px | 🎨 分辨率: {_ppi} PPI")
         st.header("🖼️ 预览")
         st.image(st.session_state.generated_image, width='stretch')
         if st.session_state.pdf_bytes:
