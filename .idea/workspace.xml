@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0b83f6fa-faed-486e-afc8-e74b52bb6139" name="更改" comment="优化新市场箱唛程序，主要主唛SKU与公司信息的错位识别" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/merge/carton-marking-generation" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="ProjectId" id="395tgFg5iAft4s0t43GNwyuMd3b" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "true",
+    "last_opened_file_path": "D:/work/TMR/合同生成",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "terminal",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="Python.generation_core_v3">
+    <configuration name="general_functions备份" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="箱唛设计" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="D:\work\TMR\箱唛设计\箱唛图设计\新市场对开盖-样式-1\general_functions备份.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="general_functions" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="箱唛设计" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1/general_functions.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="generation_core (5)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="箱唛设计" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1/generation_core.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="generation_core_v3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="箱唛设计" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/merge/carton-marking-generation" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/merge/carton-marking-generation/generation_core_v3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="style_New_market_GE_UK_FR_vertical" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="箱唛设计" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/merge/carton-marking-generation" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="D:\work\TMR\箱唛设计\merge\carton-marking-generation\style_New_market_GE_UK_FR_vertical.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.generation_core_v3" />
+        <item itemvalue="Python.generation_core (5)" />
+        <item itemvalue="Python.style_New_market_GE_UK_FR_vertical" />
+        <item itemvalue="Python.general_functions备份" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="0b83f6fa-faed-486e-afc8-e74b52bb6139" name="更改" comment="" />
+      <created>1769997868971</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769997868971</updated>
+      <workItem from="1769997870033" duration="19000" />
+      <workItem from="1770107639288" duration="6034000" />
+      <workItem from="1770168488223" duration="3184000" />
+      <workItem from="1770172222684" duration="9346000" />
+      <workItem from="1770511362136" duration="1250000" />
+      <workItem from="1771235756753" duration="1186000" />
+      <workItem from="1771893748406" duration="20673000" />
+      <workItem from="1771985888121" duration="7201000" />
+      <workItem from="1772002224156" duration="11103000" />
+      <workItem from="1772066689569" duration="1322000" />
+      <workItem from="1772090756627" duration="48264000" />
+      <workItem from="1772411617126" duration="12199000" />
+      <workItem from="1772432266971" duration="477000" />
+      <workItem from="1772584494409" duration="17389000" />
+      <workItem from="1772676007993" duration="29000" />
+      <workItem from="1772677032585" duration="2277000" />
+      <workItem from="1772696106841" duration="8151000" />
+      <workItem from="1772779703020" duration="19000" />
+      <workItem from="1773299610988" duration="2340000" />
+      <workItem from="1773389956294" duration="7134000" />
+      <workItem from="1773626697087" duration="24870000" />
+    </task>
+    <task id="LOCAL-00001" summary="优化mcombo的垂直样式">
+      <created>1772702250990</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772702250990</updated>
+    </task>
+    <task id="LOCAL-00002" summary="优化mcombo的垂直样式">
+      <created>1772702487732</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772702487732</updated>
+    </task>
+    <task id="LOCAL-00003" summary="将新市场的水平与垂直样式分开，并且把国家改为用户输入需要的国家">
+      <created>1772763659249</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1772763659249</updated>
+    </task>
+    <task id="LOCAL-00004" summary="将新市场的水平与垂直样式分开，并且把国家改为用户输入需要的国家">
+      <created>1773728742181</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1773728742181</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="优化mcombo的垂直样式" />
+    <MESSAGE value="将新市场的水平与垂直样式分开，并且把国家改为用户输入需要的国家" />
+    <MESSAGE value="优化新市场箱唛程序，主要主唛SKU与公司信息的错位识别" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化新市场箱唛程序，主要主唛SKU与公司信息的错位识别" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/旧版/generation_core.py</url>
+          <line>308</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/$generation_core__1_.coverage" NAME="generation_core (1) 覆盖结果" MODIFIED="1771983589380" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/旧版/备份" />
+    <SUITE FILE_PATH="coverage/$general_functions.coverage" NAME="general_functions 覆盖结果" MODIFIED="1772417334383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+    <SUITE FILE_PATH="coverage/generation_core_py$generation_core_v3.coverage" NAME="generation_core_v3 覆盖结果" MODIFIED="1773727284230" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/merge/carton-marking-generation" />
+    <SUITE FILE_PATH="coverage/$generation_core__2_.coverage" NAME="generation_core (2) 覆盖结果" MODIFIED="1772011292990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/Mcombo对开盖" />
+    <SUITE FILE_PATH="coverage/$generation_core.coverage" NAME="generation_core 覆盖结果" MODIFIED="1772002099691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/旧版" />
+    <SUITE FILE_PATH="coverage/$generation_core__5_.coverage" NAME="generation_core (5) 覆盖结果" MODIFIED="1772510611589" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+    <SUITE FILE_PATH="coverage/$generation_core__4_.coverage" NAME="generation_core (4) 覆盖结果" MODIFIED="1772270945009" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/Mcombo对开盖-样式-2-3" />
+    <SUITE FILE_PATH="coverage/$generation_core_v3.coverage" NAME="generation_core_v3 覆盖结果" MODIFIED="1772510465722" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/merge/carton-marking-generation" />
+    <SUITE FILE_PATH="coverage/generation_core_py$generation_core__5_.coverage" NAME="generation_core (5) 覆盖结果" MODIFIED="1773642718951" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+    <SUITE FILE_PATH="coverage/generation_core_py$general_functions.coverage" NAME="general_functions 覆盖结果" MODIFIED="1773397863683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/新市场对开盖-样式-1" />
+    <SUITE FILE_PATH="coverage/generation_core_py$style_New_market_GE_UK_FR.coverage" NAME="style_New_market_GE_UK_FR 覆盖结果" MODIFIED="1772615153488" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/merge/carton-marking-generation" />
+    <SUITE FILE_PATH="coverage/$generation_core__3_.coverage" NAME="generation_core (3) 覆盖结果" MODIFIED="1772012914711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/箱唛图设计/Mcombo对开盖-样式-1" />
+  </component>
+</project>
