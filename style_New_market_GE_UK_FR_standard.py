@@ -337,7 +337,8 @@ class MComboStandardStyle(BoxMarkStyle):
         size_w = bbox_size[2] - bbox_size[0]
 
         gap_px = int(1 * sku_config.dpi)
-        line_height = 7 / 0.74
+        # line_height = 7 / 0.74
+        line_height = int(0.5 * sku_config.dpi) # 黑线加粗到约 0.5cm
         line_width = int(product_w * 0.85)
         total_group_height = product_font.size + line_height + size_font.size + gap_px * 2
 
@@ -347,7 +348,9 @@ class MComboStandardStyle(BoxMarkStyle):
         # 绘制产品名称
         product_x = (canvas_w - product_w) // 2
         ascent, descent = product_font.getmetrics()
-        draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
+        # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
+        product_offset_y = int(0.5 * sku_config.dpi)  # 产品信息上移约 0.5cm
+        draw.text((product_x, group_start_y + ascent - product_offset_y), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
 
         # 绘制下划线
         line_y_top = group_start_y + product_font.size + gap_px
@@ -404,7 +407,7 @@ class MComboStandardStyle(BoxMarkStyle):
         # --- 核心修改：动态组合 [海绵标 | FSC标 | 侧唛文本框] ---
         side_elements = []
         table_h_px = int(8 * dpi)  # 固定高度 8cm
-        gap_px = int(0.6 * dpi)  # 组件之间的间距 0.6cm
+        gap_px = int(0.3 * dpi)  # 组件之间的间距 0.6cm
 
         # A. 海绵认证标 (根据开关 show_sponge 判断)
         if getattr(sku_config, 'sponge_verified', False) == True:
