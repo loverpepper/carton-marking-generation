@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     box_number = {
         'total_boxes': 3,
-        'current_box': 1
+        'current_box': 2
     }
 
     legal_info = {
@@ -201,16 +201,16 @@ if __name__ == "__main__":
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
         sku_name="6181-P-13G",
-        length_cm=106,
-        width_cm=45,
-        height_cm=26,
+        length_cm=75,
+        width_cm=60,
+        height_cm=70,
         style_name="exacme_doubleopening",  # 指定样式
         ppi=150,
         
         color='Seafoam green',
-        product='TRAMPOLINE\nPREMIUM SPRING COVER',
+        product='Lift Recliner',
         product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
-        size='', # 可选参数，MCombo 标准样式的特定参数
+        size='(Large)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
         sponge_verified=True, # 是否通过海绵测试, 可选参数, Mcombo 和 新市场 样式会用到
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path.Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_doubleopening", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_vertical", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)
