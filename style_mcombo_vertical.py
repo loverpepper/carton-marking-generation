@@ -293,7 +293,7 @@ class MComboStandardStyle(BoxMarkStyle):
 
         gap_px = int(1 * sku_config.dpi)
         # line_height = 7 / 0.74
-        line_height = int(0.5 * sku_config.dpi) # 黑线加粗到约 0.5cm
+        line_height = int(0.3 * sku_config.dpi) # 黑线加粗到约 0.5cm
         line_width = int(product_w * 0.85)
         total_group_height = product_font.size + line_height + size_font.size + gap_px * 2
 
