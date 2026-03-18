@@ -448,7 +448,7 @@ with tab_single:
             nm_contact_info = st.text_input("联系方式 contact_info",
                                             value="www.mcombo.com / sale_uk@newacmellc.com")
             nm_show_fsc    = st.selectbox("显示FSC标志 show_fsc",    options=["否", "是"], index=0) == "是"
-            nm_show_sponge = st.selectbox("显示海绵认证 show_sponge", options=["否", "是"], index=0) == "是"
+            # nm_show_sponge = st.selectbox("显示海绵认证 show_sponge", options=["否", "是"], index=0) == "是"
 
         with nm_col2:
             st.subheader("📋 法律条款开关")
