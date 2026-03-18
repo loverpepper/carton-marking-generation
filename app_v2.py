@@ -523,7 +523,7 @@ with tab_single:
                     legal_3_5=nm_legal_3_5,
                     legal_3_6=nm_legal_3_6,
                     show_fsc=nm_show_fsc,
-                    show_sponge=nm_show_sponge,
+                    # show_sponge=nm_show_sponge,
                     country=nm_country if nm_country else None,
                     **style_params
                 )
