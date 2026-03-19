@@ -4,7 +4,7 @@ Streamlit 应用 - 新版，支持多样式选择 + 批量Excel生成
 """
 import streamlit as st
 from PIL import Image, ImageDraw
-import pathlib as Path
+from pathlib import Path
 import io
 import zipfile
 import traceback
@@ -298,19 +298,6 @@ tab_single, tab_batch = st.tabs(["🖊️ 单个生成", "📊 批量生成（Ex
 # ──────────────────────────────────────────────────────────────────────────────
 with tab_single:
 
-    # 添加示例预览图
-    try:
-        preview_image_path = Path.Path(__file__).parent / 'layout_validation.jpg'
-        if preview_image_path.exists():
-            col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-            with col_logo2:
-                preview_img = Image.open(preview_image_path)
-                st.image(preview_img, caption="箱唛示例预览", width="stretch")
-    except:
-        pass
-
-    st.markdown("---")
-
     # 获取所有可用样式
     available_styles = BoxMarkGenerator.list_available_styles()
     style_names = [s['name'] for s in available_styles]
@@ -430,11 +417,11 @@ with tab_single:
         )
         if line_drawing_file is not None:
             import tempfile
-            suffix = Path.Path(line_drawing_file.name).suffix
+            suffix = Path(line_drawing_file.name).suffix
             tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
             tmp.write(line_drawing_file.read())
             tmp.close()
-            style_params['img_line_drawing'] = Path.Path(tmp.name)
+            style_params['img_line_drawing'] = Path(tmp.name)
             st.image(line_drawing_file, caption="线描图预览", width='stretch')
 
     # ── 新市场专用参数（折叠区块）──
@@ -528,7 +515,7 @@ with tab_single:
                     country=nm_country if nm_country else None,
                     **style_params
                 )
-                base_dir = Path.Path(__file__).parent
+                base_dir = Path(__file__).parent
                 generator = BoxMarkGenerator(base_dir=base_dir, style_name=selected_style, ppi=ppi)
                 canvas    = generator.generate_complete_layout(test_sku)
                 canvas_rgb = canvas.convert('RGB')
@@ -681,7 +668,7 @@ with tab_batch:
 
                 # ── 执行批量生成 ──
                 if do_batch:
-                    base_dir = Path.Path(__file__).parent
+                    base_dir = Path(__file__).parent
                     zip_buffer = io.BytesIO()
                     results = []
 
