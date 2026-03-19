@@ -3,7 +3,7 @@
 新版核心生成引擎 - 使用样式注册系统
 """
 from PIL import Image, ImageDraw
-import pathlib as Path
+from pathlib import Path
 from style_base import StyleRegistry
 
 # 导入所有样式模块以自动注册
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     )
     
     # 创建生成器
-    base_dir = Path.Path(__file__).parent
+    base_dir = Path(__file__).parent
     generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_doubleringandburiedtrampoline", ppi=150)
     
     # 生成箱唛

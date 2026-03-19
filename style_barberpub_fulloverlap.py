@@ -113,8 +113,8 @@ class BarberpubFullOverlapStyle(BoxMarkStyle):
         font_base = self.base_dir / 'assets' / 'Barberpub' / '全搭盖' / '箱唛字体'
         self.font_paths = {
             'CentSchbook BT': str(font_base / '111.ttf'),
-            'Droid Sans Bold': str(font_base / 'CENSBKBI.ttf'),
-            'Calibri Bold': str(font_base / 'calibri_blod.TTF'),
+            'Droid Sans Bold': str(font_base / 'CENSBKBI.TTF'),
+            'Calibri Bold': str(font_base / 'calibri_blod.ttf'),
 
         }
 
