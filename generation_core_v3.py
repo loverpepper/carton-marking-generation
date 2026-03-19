@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     box_number = {
         'total_boxes': 3,
-        'current_box': 1
+        'current_box': 2
     }
 
     legal_info = {
@@ -210,7 +210,7 @@ if __name__ == "__main__":
         color='Seafoam green',
         product='DOUBLE-FRAME TRAMPOLINE', # 可选参数
         product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
-        size='', # 可选参数，MCombo 标准样式的特定参数
+        size='(Large)', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
         sponge_verified=True, # 是否通过海绵测试, 可选参数, Mcombo 和 新市场 样式会用到
