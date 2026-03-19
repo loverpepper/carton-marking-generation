@@ -108,6 +108,7 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             'icon_side_label_narrow': Image.open(res_base / '侧唛标签_窄.png').convert('RGBA'),
             'icon_slogan': Image.open(res_base / '正唛宣传语.png').convert('RGBA'),
             'icon_box_info': Image.open(res_base / '正唛多箱选择框.png').convert('RGBA'),
+            'line_drawing': Image.open(res_base / '侧唛线描图.png').convert('RGBA'),
         }
     
     def _load_fonts(self):
@@ -345,8 +346,12 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             draw = ImageDraw.Draw(canvas)  # 重新创建draw对象，因为canvas被更新了
             
             # --- 区域 B: 线描图 (居左，高度为侧唛 2/3) ---
-            # img_line_drawing = self.resources['img_line_drawing']
-            img_line_drawing = sku_config.img_line_drawing
+            
+            # 优先使用用户上传的线描图（来自 app_v2.py 的 img_line_drawing 上传口），否则退回资源文件
+            if hasattr(sku_config, 'img_line_drawing') and sku_config.img_line_drawing is not None:
+                img_line_drawing = Image.open(sku_config.img_line_drawing).convert('RGBA')
+            else:
+                img_line_drawing = self.resources['line_drawing']
             
             line_h = int(canvas_h * 0.66) # 侧唛的三分之二
             img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)
@@ -433,8 +438,11 @@ class BarberpubDoubleOpeningStyle(BoxMarkStyle):
             """
             
             # --- 区域 B: 线描图（在网址下方间隔3cm，高度为canvas_h的46%）---
-            # img_line_drawing = self.resources['img_line_drawing']
-            img_line_drawing = sku_config.img_line_drawing
+            # 优先使用用户上传的线描图（来自 app_v2.py 的 img_line_drawing 上传口），否则退回资源文件
+            if hasattr(sku_config, 'img_line_drawing') and sku_config.img_line_drawing is not None:
+                img_line_drawing = Image.open(sku_config.img_line_drawing).convert('RGBA')
+            else:
+                img_line_drawing = self.resources['line_drawing']
             
             line_h = int(canvas_h * 0.46)  # 高度为画布高度的46%
             img_line_resized = general_functions.scale_by_height(img_line_drawing, line_h)

@@ -260,10 +260,10 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         canvas = Image.new(sku_config.color_mode, (canvas_w, canvas_h), sku_config.background_color)
         # draw = ImageDraw.Draw(canvas)
         
-        if sku_config.l_cm > 130 and sku_config.w_cm < 37:
+        if sku_config.l_cm > 130 and sku_config.w_cm < 40:
             """
                 依据长宽条件选择高竖标签还是宽横标签：
-                长大于130cm且宽小于37cm的，使用高竖标签；其他情况使用宽横标签。
+                长大于130cm且宽小于40cm的，使用高竖标签；其他情况使用宽横标签。
                 这个条件是根据 Exacme 的设计图和实际产品尺寸总结出来的经验规则，目的是让标签在侧面看起来更协调。
             """
             print("使用高竖标签")
@@ -353,11 +353,11 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
 
         # ================= 2. 中间：条件判定替换信息图 =================
         # 依据长宽条件选择垂直或水平的图标
-        if sku_config.l_cm > 130 and sku_config.w_cm < 37:
+        if sku_config.l_cm > 130 and sku_config.w_cm < 40:
             
             icon_middle_ori = self.resources['icon_middle_info_horizontal']
             # 中间信息图宽度大约占画布的 55%
-            middle_img = engine.Image(icon_middle_ori, width=int(canvas.width * 0.93))
+            middle_img = engine.Image(icon_middle_ori, width=int(canvas.width * 0.93), nudge_y=int(canvas.height * 0.04)) # 水平图需要往下微调，让它看起来更靠近底部
             
             # 【魔法降临：计算绝对居中的动态间距】
             # 2.1 我们的目标：让 middle_img 的顶部，刚好落在需要的那个 Y 坐标上
@@ -452,7 +452,7 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         content_h = int(icon_side_label.height * 0.78)
         
         # 2. 准备所有需要的字体
-        font_size_huge = int(content_h * 0.53) 
+        font_size_huge = int(content_h * 0.5088) 
         font_huge = ImageFont.truetype(fonts_paths['Arial Black'], font_size_huge)
         
         font_size_box = int(content_h * 0.18)
@@ -584,7 +584,7 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         main_panel.layout(start_x, start_y)
         main_panel.render(draw)
         
-        icon_side_label.show()
+        # icon_side_label.show()
         
         return icon_side_label
     
