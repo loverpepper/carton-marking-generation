@@ -43,6 +43,31 @@ def paste_center_with_height(canvas, icon, height_cm, dpi):
     
     return canvas
 
+def paste_center_with_width(canvas, icon, width_cm, dpi):
+    """
+    将 icon 按照指定宽度等比例缩放后，居中粘贴到 canvas 上
+    """
+    # 1. 计算目标宽度的像素值
+    target_width_px = int(width_cm * dpi)
+
+    # 2. 计算缩放比例并调整图片大小
+    original_w, original_h = icon.size
+    ratio = target_width_px / original_w
+    target_height_px = int(original_h * ratio)
+
+    # 调整图标尺寸
+    icon_resized = icon.resize((target_width_px, target_height_px), Image.Resampling.LANCZOS)
+
+    # 3. 计算居中坐标
+    canvas_w, canvas_h = canvas.size
+    paste_x = (canvas_w - target_width_px) // 2
+    paste_y = (canvas_h - target_height_px) // 2
+
+    # 4. 粘贴到画布
+    canvas.paste(icon_resized, (paste_x, paste_y), mask=icon_resized)
+    
+    return canvas
+
 def scale_by_height(image, target_height):
     """根据目标高度等比例缩放图片"""
     if not isinstance(image, Image.Image):
@@ -1024,6 +1049,11 @@ def fill_sidepanel_text(icon_side_text_box_resized, sku_config, fonts_paths):
     # A. 左侧 SKU 条码
     # 宽度大约占局部表格的 46%，高度 35%
     sku_barcode_img = generate_barcode_image(sku_config.sku_name, width=int(tw * 0.46), height=barcode_h_px)
+
+    print(f"[侧唛SKU调试-条码] 条码高度: {barcode_h_px}px ({barcode_h_px / sku_config.dpi:.1f}cm)")
+    barcode_w_px = scale_by_height(sku_barcode_img, barcode_h_px).width
+    print(f"[侧唛SKU调试-条码] 条码宽度: {barcode_w_px}px ({barcode_w_px / sku_config.dpi:.1f}cm)")
+    
     sku_x = int(left_zone_center - sku_barcode_img.width / 2)
     icon_side_text_box_resized.paste(sku_barcode_img, (sku_x, int(barcode_y)))
     

@@ -200,17 +200,17 @@ if __name__ == "__main__":
 
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6189-M08TU-1",
-        length_cm=130,
+        sku_name="6160-HL164DE-2",
+        length_cm=93,
         width_cm=33,
-        height_cm=9,
+        height_cm=59,
         style_name="exacme_topandbottom_doubleringandburiedtrampoline",  # 指定样式
         ppi=150,
         
         color='Seafoam green',
-        product='DOUBLE-FRAME TRAMPOLINE', # 可选参数
+        product='Power Recliner Chair', # 可选参数
         product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
-        size='(Large)', # 可选参数，MCombo 标准样式的特定参数
+        size='Zero Wall Hugger', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
         box_number=box_number,
         sponge_verified=True, # 是否通过海绵测试, 可选参数, Mcombo 和 新市场 样式会用到
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="exacme_topandbottom_doubleringandburiedtrampoline", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_vertical", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

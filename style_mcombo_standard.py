@@ -95,7 +95,10 @@ class MComboStandardStyle(BoxMarkStyle):
             'icon_left_2_panel': Image.open(res_base / '顶部-左-2箱.png').convert('RGBA'),
             'icon_left_3_panel': Image.open(res_base / '顶部-左-3箱.png').convert('RGBA'),
             'icon_right_2-1_panel': Image.open(res_base / '顶部-右-2-1.png').convert('RGBA'),
+            'icon_right_2-2_panel': Image.open(res_base / '顶部-右-2-2.png').convert('RGBA'),
             'icon_right_3-1_panel': Image.open(res_base / '顶部-右-3-1.png').convert('RGBA'),
+            'icon_right_3-2_panel': Image.open(res_base / '顶部-右-3-2.png').convert('RGBA'),
+            'icon_right_3-3_panel': Image.open(res_base / '顶部-右-3-3.png').convert('RGBA'),
             'icon_trademark': Image.open(res_base / '正唛logo.png').convert('RGBA'),
             'icon_company': Image.open(res_base / '正唛公司信息.png').convert('RGBA'),
             'icon_box_number_1': Image.open(res_base / '正唛 Box 1.png').convert('RGBA'),
@@ -104,7 +107,7 @@ class MComboStandardStyle(BoxMarkStyle):
             'icon_side_label_box': Image.open(res_base / '侧唛标签框.png').convert('RGBA'),
             'icon_side_logo': Image.open(res_base / '侧唛logo.png').convert('RGBA'),
             'icon_side_text_box': Image.open(res_base / '侧唛文本框.png').convert('RGBA'),
-            'icon_side_sponge': Image.open(res_base / '海绵认证.png').convert('RGBA')
+            'icon_side_sponge': general_functions.make_it_pure_black(Image.open(res_base / '海绵认证.png').convert('RGBA'))
         }
     
     def _load_fonts(self):
@@ -163,10 +166,26 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_left_up_panel = icon_left_panel
         icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
         
-        canvas_left_up = general_functions.paste_center_with_height(
-            canvas_left_up, icon_left_up_panel, height_cm=10, dpi=sku_config.dpi)
-        canvas_left_down = general_functions.paste_center_with_height(
-            canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
+        # 计算图标的目标高度（厘米）
+        target_height_cm = 10  # 默认高度10cm
+        max_width_cm = sku_config.l_px * 0.8 / sku_config.dpi  # 面板长度的85%转换为cm
+        
+        # 获取原始尺寸（像素），计算按高度10cm缩放后的宽度（厘米）
+        icon_w_px, icon_h_px = icon_left_panel.size
+        scaled_width_cm = icon_w_px / icon_h_px * target_height_cm  # 宽高比 × 目标高度
+        print(f"左侧面板原始宽度: {scaled_width_cm:.2f}cm ")
+        # 如果按10cm高度缩放后，宽度超过面板长度的85%，则改用宽度限制
+        if scaled_width_cm > max_width_cm:
+            canvas_left_up = general_functions.paste_center_with_width(
+                canvas_left_up, icon_left_up_panel, width_cm=max_width_cm, dpi=sku_config.dpi)
+            canvas_left_down = general_functions.paste_center_with_width(
+                canvas_left_down, icon_left_down_panel, width_cm=max_width_cm, dpi=sku_config.dpi)
+        else:
+            # 宽度没超过限制，按10cm高度缩放
+            canvas_left_up = general_functions.paste_center_with_height(
+                canvas_left_up, icon_left_up_panel, height_cm=target_height_cm, dpi=sku_config.dpi)
+            canvas_left_down = general_functions.paste_center_with_height(
+                canvas_left_down, icon_left_down_panel, height_cm=target_height_cm, dpi=sku_config.dpi)
         return canvas_left_up, canvas_left_down
     
     def generate_right_panel(self, sku_config):
@@ -175,15 +194,32 @@ class MComboStandardStyle(BoxMarkStyle):
         canvas_right_down = Image.new(sku_config.color_mode, (sku_config.l_px, sku_config.half_w_px), sku_config.background_color)
         
         total_box_number = sku_config.box_number['total_boxes']
-        icon_right_panel = self.resources[f'icon_right_{total_box_number}-1_panel']
+        current_box_number = sku_config.box_number['current_box']
+        icon_right_panel = self.resources[f'icon_right_{total_box_number}-{current_box_number}_panel']
         
         icon_right_panel_up = icon_right_panel.rotate(180, expand=True)
         icon_right_panel_down = icon_right_panel
         
-        canvas_right_up = general_functions.paste_center_with_height(
-            canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
-        canvas_right_down = general_functions.paste_center_with_height(
-            canvas_right_down, icon_right_panel_down, height_cm=9, dpi=sku_config.dpi)
+        target_height_cm = 10  # 默认高度10cm
+        max_width_cm = sku_config.l_px * 0.8 / sku_config.dpi  # 面板长度的85%转换为cm
+        
+        # 获取原始尺寸（像素），计算按高度10cm缩放后的宽度（厘米）
+        icon_w_px, icon_h_px = icon_right_panel.size
+        scaled_width_cm = icon_w_px / icon_h_px * target_height_cm  # 宽高比 × 目标高度
+        
+        # 如果按10cm高度缩放后，宽度超过面板长度的85%，则改用宽度限制
+        if scaled_width_cm > max_width_cm:
+            canvas_right_up = general_functions.paste_center_with_width(
+                canvas_right_up, icon_right_panel_up, width_cm=max_width_cm, dpi=sku_config.dpi)
+            canvas_right_down = general_functions.paste_center_with_width(
+                canvas_right_down, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
+        else:
+            # 宽度没超过限制，按10cm高度缩放
+            canvas_right_up = general_functions.paste_center_with_height(
+                canvas_right_up, icon_right_panel_up, height_cm=target_height_cm, dpi=sku_config.dpi)
+            canvas_right_down = general_functions.paste_center_with_height(
+                canvas_right_down, icon_right_panel_down, height_cm=target_height_cm, dpi=sku_config.dpi)
+
         return canvas_right_up, canvas_right_down
     
     def generate_front_panel(self, sku_config):
@@ -226,14 +262,51 @@ class MComboStandardStyle(BoxMarkStyle):
         draw.text((color_x, color_y), color_text, font=color_font, fill=(161,142,102))
         
         # 写入产品名称和尺寸信息
+        # ========== 修改开始：动态调整 product 字体大小 ==========
+        fonts = self._get_fonts(sku_config)
+
+        # 计算 product 文字的最大允许宽度（箱子长度的85%）
+        max_product_width = int(sku_config.l_px * 0.85)
+
         product_text = sku_config.product
-        size_text = sku_config.size
         product_font = fonts['product_font']
-        size_font = fonts['size_font']
-        bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
-        bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
+
+        # 检查当前字体是否超出限制，如果超出则缩小字体
+        bbox_product = product_font.getbbox(product_text)
         product_w = bbox_product[2] - bbox_product[0]
+
+        # 如果文字宽度超过限制，按比例缩小字体
+        if product_w > max_product_width:
+            scale_factor = max_product_width / product_w
+            new_font_size = int(product_font.size * scale_factor)
+            # 重新加载字体，使用新的大小
+            product_font = ImageFont.truetype(
+                self.font_paths['itc_demi'],
+                size=new_font_size
+            )
+            # 重新计算文字宽度
+            bbox_product = product_font.getbbox(product_text)
+            product_w = bbox_product[2] - bbox_product[0]
+
+        # product_text = sku_config.product
+        # product_font = fonts['product_font']
+        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
+        # product_w = bbox_product[2] - bbox_product[0]
+
+        size_text = sku_config.size
+        size_font = fonts['size_font']
+        bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
         size_w = bbox_size[2] - bbox_size[0]
+        
+        # # 写入产品名称和尺寸信息
+        # product_text = sku_config.product
+        # size_text = sku_config.size
+        # product_font = fonts['product_font']
+        # size_font = fonts['size_font']
+        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
+        # bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
+        # product_w = bbox_product[2] - bbox_product[0]
+        # size_w = bbox_size[2] - bbox_size[0]
         
         gap_px = int(1 * sku_config.dpi)
         # line_height = 7 / 0.74
@@ -277,20 +350,28 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_side_label_box = self.resources['icon_side_label_box']
         icon_side_label_box_resized = general_functions.scale_by_height(
             icon_side_label_box, int(5 * sku_config.dpi))
-        icon_side_label_box_x, icon_side_label_box_y = int(3 * sku_config.dpi), int(4 * sku_config.dpi)
+        icon_side_label_box_x, icon_side_label_box_y = int(3 * sku_config.dpi), int(3 * sku_config.dpi)
         canvas.paste(icon_side_label_box_resized, (icon_side_label_box_x, icon_side_label_box_y), 
                     mask=icon_side_label_box_resized)
         
         # 放置侧唛 logo
         icon_side_logo = self.resources['icon_side_logo']
-        icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, int(5 * sku_config.dpi))
+        side_logo_height = int(5 * sku_config.dpi)  # 修正拼写：heigft → height
+        # logo宽度不能超过 (侧唛宽度 - 8cm) 的一半
+        max_side_logo_width = int((sku_config.w_px - 8 * sku_config.dpi) * 0.5)
+        # 先按高度5cm缩放
+        icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, side_logo_height)
         icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
+        # 如果按高度缩放后，宽度超过限制，则按宽度限制重新缩放
+        if icon_side_logo_w > max_side_logo_width:
+            icon_side_logo_resized = general_functions.scale_by_width(icon_side_logo, max_side_logo_width)
+            icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
         icon_side_logo_x = canvas.width - icon_side_logo_w - int(4 * sku_config.dpi)
         icon_side_logo_y = int(4 * sku_config.dpi)
         canvas.paste(icon_side_logo_resized, (icon_side_logo_x, icon_side_logo_y), mask=icon_side_logo_resized)
         
         # 放置侧唛文字信息框
-        icon_side_text_box_spacing_left = int(4 * sku_config.dpi)
+        icon_side_text_box_spacing_left = int(2.81 * sku_config.dpi)
         icon_side_text_box_spacing_bottom = int(3 * sku_config.dpi)
         table_height_px = int(8 * sku_config.dpi)
         

@@ -179,8 +179,27 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_left_up_panel = icon_left_panel
         # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
 
-        canvas_left_up = general_functions.paste_center_with_height(
-            canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
+        # 计算图标的目标高度（厘米）
+        target_height_cm = 18  # 默认高度18cm
+        max_width_cm = sku_config.l_px * 0.8 / sku_config.dpi  # 面板长度的85%转换为cm
+        
+        # 获取原始尺寸（像素），计算按高度18cm缩放后的宽度（厘米）
+        icon_w_px, icon_h_px = icon_left_panel.size
+        scaled_width_cm = icon_w_px / icon_h_px * target_height_cm  # 宽高比 × 目标高度
+        print(f"左侧面板原始宽度: {scaled_width_cm:.2f}cm ")
+        # 如果按18cm高度缩放后，宽度超过面板长度的85%，则改用宽度限制
+        if scaled_width_cm > max_width_cm:
+            canvas_left_up = general_functions.paste_center_with_width(
+                canvas_left_up, icon_left_up_panel, width_cm=max_width_cm, dpi=sku_config.dpi)
+        else:
+            # 宽度没超过限制，按18cm高度缩放
+            canvas_left_up = general_functions.paste_center_with_height(
+                canvas_left_up, icon_left_up_panel, height_cm=target_height_cm, dpi=sku_config.dpi)
+
+
+
+        # canvas_left_up = general_functions.paste_center_with_height(
+        #     canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
         # canvas_left_down = general_functions.paste_center_with_height(
         #     canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
 
@@ -200,10 +219,31 @@ class MComboStandardStyle(BoxMarkStyle):
 
         icon_right_panel_down = icon_left_panel.rotate(180, expand=True)
 
+        target_height_cm = 18  # 默认高度18cm
+        max_width_cm = sku_config.l_px * 0.8 / sku_config.dpi  # 面板长度的85%转换为cm
+        
+        # 获取原始尺寸（像素），计算按高度18cm缩放后的宽度（厘米）
+        icon_w_px, icon_h_px = icon_right_panel_down.size
+        scaled_width_cm = icon_w_px / icon_h_px * target_height_cm  # 宽高比 × 目标高度
+        
+        # 如果按18cm高度缩放后，宽度超过面板长度的85%，则改用宽度限制
+        if scaled_width_cm > max_width_cm:
+            # canvas_right_up = general_functions.paste_center_with_width(
+            #     canvas_right_up, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
+            canvas_right_down = general_functions.paste_center_with_width(
+                canvas_right_down, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
+        else:
+            # 宽度没超过限制，按18cm高度缩放
+            # canvas_right_up = general_functions.paste_center_with_height(
+            #     canvas_right_up, icon_right_panel_up, height_cm=target_height_cm, dpi=sku_config.dpi)
+            canvas_right_down = general_functions.paste_center_with_height(
+                canvas_right_down, icon_right_panel_down, height_cm=target_height_cm, dpi=sku_config.dpi)
+
+
         # canvas_right_up = general_functions.paste_center_with_height(
         #     canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
-        canvas_right_down = general_functions.paste_center_with_height(
-            canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
+        # canvas_right_down = general_functions.paste_center_with_height(
+        #     canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
 
         return canvas_right_up, canvas_right_down
 
@@ -342,14 +382,22 @@ class MComboStandardStyle(BoxMarkStyle):
 
         # 放置侧唛 logo
         icon_side_logo = self.resources['icon_side_logo']
-        icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, int(4 * sku_config.dpi))
+        side_logo_height = int(4 * sku_config.dpi)  # 修正拼写：heigft → height
+        # logo宽度不能超过 (侧唛宽度 - 8cm) 的一半
+        max_side_logo_width = int((sku_config.h_px - 8 * sku_config.dpi) * 0.5)
+        # 先按高度5cm缩放
+        icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, side_logo_height)
         icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
+        # 如果按高度缩放后，宽度超过限制，则按宽度限制重新缩放
+        if icon_side_logo_w > max_side_logo_width:
+            icon_side_logo_resized = general_functions.scale_by_width(icon_side_logo, max_side_logo_width)
+            icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
         icon_side_logo_x = canvas.width - icon_side_logo_w - int(4 * sku_config.dpi)
         icon_side_logo_y = int(4 * sku_config.dpi)
         canvas.paste(icon_side_logo_resized, (icon_side_logo_x, icon_side_logo_y), mask=icon_side_logo_resized)
 
         # 放置侧唛文字信息框
-        icon_side_text_box_spacing_left = int(3 * sku_config.dpi)
+        icon_side_text_box_spacing_left = int(2.81 * sku_config.dpi)
         icon_side_text_box_spacing_bottom = int(1 * sku_config.dpi)
 
         table_height_px = int(8 * sku_config.dpi)
