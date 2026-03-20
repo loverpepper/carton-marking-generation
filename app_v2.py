@@ -563,7 +563,8 @@ with tab_single:
             st.markdown(f"  - 必需参数: `{', '.join(style_info['required_params'])}`")
     st.markdown("""
 ### 🌐 局域网访问
-连接公司WIFI【tomorrow】后访问: `http://192.168.1.54:8501`
+太原：连接公司WIFI【tomorrow】后访问: `http://192.168.1.54:8501`
+宁波：连接公司WIFI后访问: `http://【郭昕电脑的IP】:8501
 """)
 
 
