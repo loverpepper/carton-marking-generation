@@ -293,7 +293,7 @@ class MComboStandardStyle(BoxMarkStyle):
         # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
         # product_w = bbox_product[2] - bbox_product[0]
 
-        size_text = sku_config.size
+        size_text = getattr(sku_config, 'size', None) or " " # 如果尺寸信息为空，则使用一个空格占位，避免后续计算出错
         size_font = fonts['size_font']
         bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
         size_w = bbox_size[2] - bbox_size[0]
