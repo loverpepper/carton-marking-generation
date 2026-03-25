@@ -18,6 +18,8 @@ import style_exacme_topandbottom_doubleringandburiedtrampoline
 import style_mcombo_vertical
 import style_New_market_GE_UK_FR_vertical
 import style_New_market_GE_UK_FR_standard
+import style_macrout_topandbottom
+import style_lovupet_doubleopening
 # 未来在这里导入更多样式:
 # import style_simple
 # import style_premium
@@ -54,8 +56,8 @@ class SKUConfig:
         self.h_in = height_cm / 2.54
         self.bottom_gb_h = bottom_gb_h_cm
         self.style_name = style_name
-        self.dpi = ppi / 2.54
-        self.ppi = ppi
+        self.dpi = ppi / 2.54 # 将 PPI 转换为每厘米的像素数，实际上代表着pixels per centimeter (PPCM)，但为了保持与旧代码中 dpi 的语义一致，我们继续使用 dpi 这个属性名。
+        self.ppi = ppi # 
         self.color_mode = 'RGB'  # 默认颜色模式
         self.background_color = (161, 142, 102)  # 默认RGB背景色
         # self.background_color = (0, 12, 37, 37)  # 默认CMYK背景色，颜色设置还有问题
@@ -117,6 +119,8 @@ class BoxMarkGenerator:
         layout = self.style.get_layout_config(sku_config)
         panels_mapping = self.style.get_panels_mapping(sku_config)
         
+        print(f"📐 开始使用样式 '{self.style_name}' 生成箱唛，布局格子: {len(layout)}")
+        
         # 2. 计算画布总尺寸（根据布局的最大范围）
         max_x = max(x + w for x, y, w, h in layout.values())
         max_y = max(y + h for x, y, w, h in layout.values())
@@ -141,6 +145,7 @@ class BoxMarkGenerator:
             shape = [x, y, x + w, y + h]
             draw.rectangle(shape, outline=(0,0,0), width=3)
         
+        print(f"🖼️ 完成布局渲染，画布尺寸: {canvas.width}x{canvas.height}px")
         return canvas
     
     def save_as_pdf(self, canvas, output_path, sku_config):
@@ -177,8 +182,8 @@ def visualize_layout(sku_config, generator):
 if __name__ == "__main__":
     # 使用新框架生成箱唛
     sku_text = {
-        'gw_value': 30.9, #LBS 毛重
-        'nw_value': 24.7, #LBS 净重
+        'gw_value': 33.72, #LBS 毛重
+        'nw_value': 29.75, #LBS 净重
         'sn_code': '09429381135347',
         'origin_text':'MADE IN CHINA',
     }
@@ -200,15 +205,15 @@ if __name__ == "__main__":
 
     # 创建 SKU 配置（使用新方式）
     test_sku = SKUConfig(
-        sku_name="6160-HL164DE-2",
-        length_cm=93,
-        width_cm=33,
-        height_cm=59,
-        style_name="exacme_topandbottom_doubleringandburiedtrampoline",  # 指定样式
+        sku_name="6012-PS798CW",
+        length_cm=32,
+        width_cm=32,
+        height_cm=85,
+        style_name="lovupet_doubleopening",  # 指定样式
         ppi=150,
         
-        color='Seafoam green',
-        product='Power Recliner Chair', # 可选参数
+        color='White',
+        product='Storage Shed Shelves', # 可选参数
         product_fullname = 'TRAMPOLINE\nPREMIUM SPRING COVER', # 可选参数，Exacme 对开盖会用到
         size='Zero Wall Hugger', # 可选参数，MCombo 标准样式的特定参数
         side_text=sku_text,
@@ -227,7 +232,7 @@ if __name__ == "__main__":
     
     # 创建生成器
     base_dir = Path(__file__).parent
-    generator = BoxMarkGenerator(base_dir=base_dir, style_name="mcombo_vertical", ppi=150)
+    generator = BoxMarkGenerator(base_dir=base_dir, style_name="lovupet_doubleopening", ppi=150)
     
     # 生成箱唛
     visualize_layout(test_sku, generator)

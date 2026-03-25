@@ -375,7 +375,7 @@ with tab_single:
         product = st.text_input("产品名称 product 【多行用 \\n 分隔】", value="Lift Recliner",
                                 help="例如: Lift Recliner, Rectangle Trampoline")
         product_fullname = st.text_input(
-            "产品全名 product_fullname 【多行用 \\n 分隔】", value="",
+            "产品全名 product_fullname （只适用Exacme 品牌）【多行用 \\n 分隔】", value="",
             help="多行用 \\n 分隔，部分样式专用，留空忽略"
         )
         if color:   style_params['color'] = color
