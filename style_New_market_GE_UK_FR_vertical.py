@@ -203,7 +203,6 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
 
         icon_left_up_panel = icon_left_panel
-        # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
 
         canvas_left_up = general_functions.paste_center_with_height(
             canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
@@ -260,9 +259,6 @@ class MComboStandardStyle(BoxMarkStyle):
         else:
             # 宽度未超限，使用按高度缩放的结果
             icon_trademark_resized = icon_by_height
-
-        # icon_trademark_target_h = canvas_h // 3
-        # icon_trademark_resized = general_functions.scale_by_height(icon_trademark, icon_trademark_target_h)
 
         icon_trademark_target_w, icon_trademark_target_h = icon_trademark_resized.size
         paste_x = (canvas_w - icon_trademark_target_w) // 2
@@ -326,18 +322,12 @@ class MComboStandardStyle(BoxMarkStyle):
             bbox_product = product_font.getbbox(product_text)
             product_w = bbox_product[2] - bbox_product[0]
 
-        # product_text = sku_config.product
-        # product_font = fonts['product_font']
-        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
-        # product_w = bbox_product[2] - bbox_product[0]
-
         size_text = getattr(sku_config, 'size', None) or " " # 如果尺寸信息为空，则使用一个空格占位，避免后续计算出错
         size_font = fonts['size_font']
         bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
         size_w = bbox_size[2] - bbox_size[0]
 
         gap_px = int(1 * sku_config.dpi)
-        # line_height = 7 / 0.74
         line_height = int(0.3 * sku_config.dpi) # 黑线加粗到约 0.5cm
         line_width = int(product_w * 0.85)
         total_group_height = product_font.size + line_height + size_font.size + gap_px * 2
@@ -348,7 +338,6 @@ class MComboStandardStyle(BoxMarkStyle):
         # 绘制产品名称
         product_x = (canvas_w - product_w) // 2
         ascent, descent = product_font.getmetrics()
-        # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
         product_offset_y = int(0.5 * sku_config.dpi)  # 产品信息上移约 0.5cm
         draw.text((product_x, group_start_y + ascent - product_offset_y), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
 
@@ -396,8 +385,6 @@ class MComboStandardStyle(BoxMarkStyle):
         safe_x_start = general_functions.draw_side_dynamic_bottom_bg_vertical_move(canvas, sku_config, icon_company, font_paths)
 
         # 3. 绘制侧唛 Logo (右上角固定位置)
-        # icon_side_logo = self.resources['icon_side_logo']
-
         icon_side_logo_resized = general_functions.scale_by_height(icon_side_logo, int(4 * dpi))
         icon_side_logo_w, icon_side_logo_h = icon_side_logo_resized.size
         icon_side_logo_x = canvas.width - icon_side_logo_w - int(2 * dpi)
@@ -498,7 +485,41 @@ class MComboStandardStyle(BoxMarkStyle):
 
     def generate_side_up_down_panel(self, sku_config):
 
-        # canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
         canvas_side_up = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.half_w_px), sku_config.background_color)
         canvas_side_down = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.half_w_px), sku_config.background_color)
         return canvas_side_up, canvas_side_down
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎升级之前（或本文件引入动态缩放/自适应逻辑前）编写的，
+# 现已成为死代码，不再被执行。请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_left_panel：固定旋转生成底部面板（已被仅生成顶部面板的逻辑取代）---
+#     # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
+
+# --- [旧方案] generate_front_panel：简单固定高度 Logo 缩放（无宽度超限检查）---
+#     # icon_trademark_target_h = canvas_h // 3
+#     # icon_trademark_resized = general_functions.scale_by_height(icon_trademark, icon_trademark_target_h)
+
+# --- [旧方案] generate_front_panel：简单产品文字宽度计算（无动态字体缩放）---
+#     # product_text = sku_config.product
+#     # product_font = fonts['product_font']
+#     # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
+#     # product_w = bbox_product[2] - bbox_product[0]
+
+# --- [旧方案] generate_front_panel：旧 line_height 计算（硬编码比例）---
+#     # line_height = 7 / 0.74
+
+# --- [旧方案] generate_front_panel：产品名称绘制（未使用垂直偏移修正）---
+#     # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
+
+# --- [旧方案] generate_side_panel：从 resources 直接引用侧唛 Logo（已改为从文件加载并黑化处理）---
+#     # icon_side_logo = self.resources['icon_side_logo']
+
+# --- [旧方案] generate_side_up_down_panel：错误的画布尺寸（混淆了高度/宽度轴向）---
+#     # canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

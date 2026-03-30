@@ -377,7 +377,6 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         # 把绘制好的横向 icon_side_label 转回竖向，再居中贴到画布上
         target_width  = int(sku_config.h_px * 0.78)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         canvas = canvas.rotate(90, expand=True) # 最后再旋转回去，得到正确方向的侧身面板

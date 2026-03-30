@@ -390,7 +390,6 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         target_width  = int(canvas.width * 0.78)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
         print(f"调整后侧唛标签宽度: {icon_side_label_resized.width / sku_config.dpi} 厘米") # 输出调整后侧唛标签宽度的实际厘米值，方便调试调整
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         
@@ -537,14 +536,11 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         # 中间产品名称（自动居中）
         font_size_bottom_middle = int(canvas.height * 0.23) # 字体大小占正身高度的 23%
         font_bottom_middle = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_bottom_middle)
-        # font_size_bottom_right = int(canvas.height * 0.10) # 字体大小占正身高度的 10%
-        # font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
         
         fullname_lines = sku_config.product_fullname.split('\n')
         center_text_upper = engine.Text(fullname_lines[0].upper(), font=font_bottom_middle)
         center_text_lower = engine.Text(fullname_lines[1].upper() if len(fullname_lines) > 1 else '', font=font_bottom_middle)
         
-        # text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
         # 把 顶行、底行 全部塞进一个大 Row 里
         spacing_text_row = int(canvas.height * 0.10) # 顶行和中间文字的间距占正身高度的 10%
         
@@ -577,3 +573,20 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         canvas_right_down = canvas.copy()
         canvas_right_up = canvas.rotate(180, expand=True) # 旋转180度作为右下角的面板
         return canvas_right_up, canvas_right_down
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新 layout_engine 逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎引入之前编写的，现已成为死代码，不再被执行。
+# 请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_exacme_right_panel（顶部面板盖面）：旧颜色文字字体变量（已被仅使用 font_bottom_middle 的方案取代）---
+#     # font_size_bottom_right = int(canvas.height * 0.10) # 字体大小占正身高度的 10%
+#     # font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
+
+# --- [旧方案] generate_exacme_right_panel（顶部面板盖面）：旧颜色文字 engine.Text 元素（已被移除）---
+#     # text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

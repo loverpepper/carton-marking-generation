@@ -235,7 +235,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
 
         # 确定尺寸: 高度按比例，但宽度强制与虚线框一致
         col_frame_h = int(canvas_h * 0.08) # 原始高度计算
-        # img_col_frame_resized = general_functions.scale_by_height(img_col_frame, col_frame_h)
         # 强制宽度一致
         img_col_frame_resized = img_col_frame.resize((img_empty_frame_resized.width, col_frame_h), Image.Resampling.LANCZOS)
 
@@ -501,8 +500,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         barcode_block.layout(x=0, y= 82)
         barcode_block.render(draw)
         
-        # icon_compact_side_label.show()  # 临时调试：查看绘制完成后的紧凑侧唛标签
-        
         return icon_compact_side_label
 
     def generate_exacme_short_side_panels(self, sku_config):
@@ -521,7 +518,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
             target_width  = int(sku_config.w_px * 0.80)
 
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
 
         canvas_short_left = canvas.rotate(-90, expand=True)
@@ -699,3 +695,19 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         row.render(draw)
 
         return canvas
+
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎引入之前编写的，现已成为死代码，不再被执行。
+# 请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_exacme_top_panel：等比例缩放颜色框（旧方案按原始宽高比缩放）---
+# 现已改为强制宽度与虚线框一致的 resize 调用，以确保颜色框和虚线框精确对齐。
+#
+#     # img_col_frame_resized = general_functions.scale_by_height(img_col_frame, col_frame_h)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================
