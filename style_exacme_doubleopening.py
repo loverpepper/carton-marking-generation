@@ -321,12 +321,15 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
         
-        ## 直接渲染在侧唛标签的顶部中心位置
-        bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
-        text_width = bbox[2] - bbox[0]
-        text_x = (icon_side_label.width - text_width) / 2
-        text_y = -bbox[1] + 20  # 用字体内部偏移抵消，让文字真正贴顶
-        draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=(0, 0, 0, 0)) # 颜色为透明色，用背景色填充，达到隐藏文字的效果
+        ## 使用 engine.Text 渲染文字，颜色设为透明以隐藏（占位排版）
+        sku_name_block = engine.Text(text_sku_name, font=font_sku_name, color=(0, 0, 0, 0))
+        sku_name_container = engine.Column(
+            fixed_width=icon_side_label.width,
+            align='center',
+            children=[sku_name_block]
+        )
+        sku_name_container.layout(x=0, y=20)
+        sku_name_container.render(draw)
         
         ############ 中间条码区 ############
         barcode_image_left_text = sku_config.sku_name # 条码下方的文字和侧唛顶部SKU_name保持一致
@@ -390,7 +393,6 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         target_width  = int(canvas.width * 0.78)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
         print(f"调整后侧唛标签宽度: {icon_side_label_resized.width / sku_config.dpi} 厘米") # 输出调整后侧唛标签宽度的实际厘米值，方便调试调整
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         
@@ -537,14 +539,11 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         # 中间产品名称（自动居中）
         font_size_bottom_middle = int(canvas.height * 0.23) # 字体大小占正身高度的 23%
         font_bottom_middle = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_bottom_middle)
-        # font_size_bottom_right = int(canvas.height * 0.10) # 字体大小占正身高度的 10%
-        # font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
         
         fullname_lines = sku_config.product_fullname.split('\n')
         center_text_upper = engine.Text(fullname_lines[0].upper(), font=font_bottom_middle)
         center_text_lower = engine.Text(fullname_lines[1].upper() if len(fullname_lines) > 1 else '', font=font_bottom_middle)
         
-        # text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
         # 把 顶行、底行 全部塞进一个大 Row 里
         spacing_text_row = int(canvas.height * 0.10) # 顶行和中间文字的间距占正身高度的 10%
         
@@ -577,3 +576,20 @@ class ExacmeDoubleOpeningStyle(BoxMarkStyle):
         canvas_right_down = canvas.copy()
         canvas_right_up = canvas.rotate(180, expand=True) # 旋转180度作为右下角的面板
         return canvas_right_up, canvas_right_down
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新 layout_engine 逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎引入之前编写的，现已成为死代码，不再被执行。
+# 请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_exacme_right_panel（顶部面板盖面）：旧颜色文字字体变量（已被仅使用 font_bottom_middle 的方案取代）---
+#     # font_size_bottom_right = int(canvas.height * 0.10) # 字体大小占正身高度的 10%
+#     # font_bottom_right = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_bottom_right)
+
+# --- [旧方案] generate_exacme_right_panel（顶部面板盖面）：旧颜色文字 engine.Text 元素（已被移除）---
+#     # text_color = engine.Text(f"( {sku_config.color.title()} )", font=font_bottom_right)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

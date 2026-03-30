@@ -310,12 +310,15 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
         
-        ## 直接渲染在侧唛标签的顶部中心位置
-        bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
-        text_width = bbox[2] - bbox[0]
-        text_x = (icon_side_label.width - text_width) / 2
-        text_y = -bbox[1] + 20  # 用字体内部偏移抵消，让文字真正贴顶
-        draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=(0, 0, 0, 0)) # 颜色为透明色，用背景色填充，达到隐藏文字的效果
+        ## 使用 engine.Text 渲染文字，颜色设为透明以隐藏（占位排版）
+        sku_name_block = engine.Text(text_sku_name, font=font_sku_name, color=(0, 0, 0, 0))
+        sku_name_container = engine.Column(
+            fixed_width=icon_side_label.width,
+            align='center',
+            children=[sku_name_block]
+        )
+        sku_name_container.layout(x=0, y=20)
+        sku_name_container.render(draw)
         
         ############ 中间条码区 ############
         barcode_image_left_text = sku_config.sku_name # 条码下方的文字和侧唛顶部SKU_name保持一致
@@ -377,7 +380,6 @@ class ExacmeFullOverlapStyle(BoxMarkStyle):
         # 把绘制好的横向 icon_side_label 转回竖向，再居中贴到画布上
         target_width  = int(sku_config.h_px * 0.78)
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
         
         canvas = canvas.rotate(90, expand=True) # 最后再旋转回去，得到正确方向的侧身面板

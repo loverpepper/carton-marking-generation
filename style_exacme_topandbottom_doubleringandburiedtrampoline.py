@@ -188,19 +188,17 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
             canvas.paste(res_icon, (pos_x, pos_y), mask=res_icon)
         
 
-        # 5. SKU (右下角，警告条上方)
+        # 5. SKU (右下角，警告条上方) - 使用 engine.Text 渲染
         sku_text = sku_config.sku_name
         font_sku_size = int(canvas_h * 0.13)
         font_sku = ImageFont.truetype(self.font_paths['Calibri Bold'], font_sku_size)
 
-        bbox = draw.textbbox((0,0), sku_text, font=font_sku)
-        sku_w = bbox[2] - bbox[0]
-        sku_h = bbox[3] - bbox[1]
-
-        sku_x = canvas_w - sku_w - int(canvas_w * 0.01)
-        sku_y = warn_bar_y - sku_h - int(canvas_h * 0.05)
-
-        draw.text((sku_x, sku_y), sku_text, font=font_sku, fill=(40, 40, 40))
+        sku_text_block = engine.Text(sku_text, font=font_sku, color=(40, 40, 40))
+        # 右对齐：x = 画布宽 - 文本宽 - 右边距
+        sku_x = canvas_w - sku_text_block.width - int(canvas_w * 0.01)
+        sku_y = warn_bar_y - sku_text_block.height - int(canvas_h * 0.05)
+        sku_text_block.layout(sku_x, sku_y)
+        sku_text_block.render(draw)
 
         # 6. Box 信息 (左下角)
         current_box = sku_config.box_number['current_box']
@@ -212,15 +210,16 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         box_y = warn_bar_y - img_box_resized.height - int(canvas_h * 0.02)
         canvas.paste(img_box_resized, (box_x, box_y), mask=img_box_resized)
 
-        # 7. 左上角 10FT
+        # 7. 左上角 10FT - 使用 engine.Text 渲染
         size_text = "10FT"
         if "10" in sku_config.sku_name: size_text = "10FT"
         elif "12" in sku_config.sku_name: size_text = "12FT"
         elif "14" in sku_config.sku_name: size_text = "14FT"
 
         font_ft = ImageFont.truetype(self.font_paths['Calibri Bold'], int(canvas_h * 0.08))
-        # 靠左纯黑色
-        draw.text((int(canvas_w * 0.01), int(canvas_h * 0.03)), size_text, font=font_ft, fill=(0, 0, 0))
+        size_text_block = engine.Text(size_text, font=font_ft, color=(0, 0, 0))
+        size_text_block.layout(int(canvas_w * 0.01), int(canvas_h * 0.03))
+        size_text_block.render(draw)
 
         # 8. 右上角 (COL: 颜色 + 虚线框)
         # 调整逻辑：先确定下方虚线框的大小，然后让颜色框跟它一样宽
@@ -235,7 +234,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
 
         # 确定尺寸: 高度按比例，但宽度强制与虚线框一致
         col_frame_h = int(canvas_h * 0.08) # 原始高度计算
-        # img_col_frame_resized = general_functions.scale_by_height(img_col_frame, col_frame_h)
         # 强制宽度一致
         img_col_frame_resized = img_col_frame.resize((img_empty_frame_resized.width, col_frame_h), Image.Resampling.LANCZOS)
 
@@ -250,7 +248,7 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
 
         canvas.paste(img_col_frame_resized, (col_x, col_y), mask=img_col_frame_resized)
 
-        # 绘制颜色文字 "COL : Turquoise"
+        # 绘制颜色文字 "COL : Turquoise" - 使用 engine.Text 渲染
         # 从配置中获取颜色，去掉括号
         color_text = "Turquoise"
         full_color_text = f"COL : {color_text}"
@@ -258,17 +256,14 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         # 字体颜色: 浅色/白色? 样图中 fondo 是深色，字是浅色
         font_col = ImageFont.truetype(self.font_paths['Calibri Bold'], int(col_frame_h * 0.5))
 
-        # 文字居中于底框
-        bbox_col = draw.textbbox((0,0), full_color_text, font=font_col)
-        text_w = bbox_col[2] - bbox_col[0]
-        text_h = bbox_col[3] - bbox_col[1]
-
-        text_x = col_x + (img_col_frame_resized.width - text_w) // 2
-        text_y = col_y + (img_col_frame_resized.height - text_h) // 2
+        # 文字居中于颜色底框
+        color_text_block = engine.Text(full_color_text, font=font_col, color=(161, 142, 102))
+        text_x = col_x + (img_col_frame_resized.width - color_text_block.width) // 2
+        text_y = col_y + (img_col_frame_resized.height - color_text_block.height) // 2
         # 微调y
         text_y -= int(col_frame_h * 0.1)
-
-        draw.text((text_x, text_y), full_color_text, font=font_col, fill=(161, 142, 102)) # 白色
+        color_text_block.layout(text_x, text_y)
+        color_text_block.render(draw)
 
         # 8.2 绘制下方虚线框 (位置依赖于颜色框)
         empty_x = col_x + (img_col_frame_resized.width - img_empty_frame_resized.width) // 2
@@ -367,12 +362,15 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
         
-        ## 直接渲染在侧唛标签的顶部中心位置
-        bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
-        text_width = bbox[2] - bbox[0]
-        text_x = (icon_side_label.width - text_width) / 2
-        text_y = -bbox[1] + 20  # 用字体内部偏移抵消，让文字真正贴顶
-        draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=(0, 0, 0, 0)) # 颜色为透明色，用背景色填充，达到隐藏文字的效果
+        ## 使用 engine.Text 渲染文字，颜色设为透明以隐藏（占位排版）
+        sku_name_block = engine.Text(text_sku_name, font=font_sku_name, color=(0, 0, 0, 0))
+        sku_name_container = engine.Column(
+            fixed_width=icon_side_label.width,
+            align='center',
+            children=[sku_name_block]
+        )
+        sku_name_container.layout(x=0, y=20)
+        sku_name_container.render(draw)
         
         ############ 中间条码区 ############
         barcode_image_left_text = sku_config.sku_name # 条码下方的文字和侧唛顶部SKU_name保持一致
@@ -442,12 +440,15 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         font_size_sku_name = general_functions.get_max_font_size(text_sku_name, self.font_paths['Arial Bold'], font_sku_name_target_width, max_height=font_sku_name_target_height) # 获取最大字号
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
         
-        ## 直接渲染在侧唛标签的顶部中心位置
-        bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
-        text_width = bbox[2] - bbox[0]
-        text_x = (icon_compact_side_label.width - text_width) // 2
-        text_y = - bbox[1] + 15  # 用字体内部偏移抵消，让文字真正贴顶
-        draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=sku_config.background_color)
+        ## 使用 engine.Text 渲染文字，颜色设为背景色以隐藏（占位排版）
+        sku_name_block = engine.Text(text_sku_name, font=font_sku_name, color=sku_config.background_color)
+        sku_name_container = engine.Column(
+            fixed_width=icon_compact_side_label.width,
+            align='center',
+            children=[sku_name_block]
+        )
+        sku_name_container.layout(x=0, y=15)
+        sku_name_container.render(draw)
         
         ############ 中间条码区 ############
         barcode_image_left_text = sku_config.sku_name # 条码下方的文字和侧唛顶部SKU_name保持一致
@@ -501,8 +502,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         barcode_block.layout(x=0, y= 82)
         barcode_block.render(draw)
         
-        # icon_compact_side_label.show()  # 临时调试：查看绘制完成后的紧凑侧唛标签
-        
         return icon_compact_side_label
 
     def generate_exacme_short_side_panels(self, sku_config):
@@ -521,7 +520,6 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
             target_width  = int(sku_config.w_px * 0.80)
 
         icon_side_label_resized = general_functions.scale_by_width(icon_side_label, target_width)
-        # icon_side_label.show()  # 临时调试：查看绘制完成后的侧唛标签
         general_functions.paste_image_center_with_heightorwidth(canvas, icon_side_label_resized, width=target_width)
 
         canvas_short_left = canvas.rotate(-90, expand=True)
@@ -699,3 +697,19 @@ class ExacmeTopAndBottomDoubleRingAndBuriedTrampolineStyle(BoxMarkStyle):
         row.render(draw)
 
         return canvas
+
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎引入之前编写的，现已成为死代码，不再被执行。
+# 请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_exacme_main_panel：等比例缩放颜色框（旧方案按原始宽高比缩放）---
+# 现已改为强制宽度与虚线框一致的 resize 调用，以确保颜色框和虚线框精确对齐。
+#
+#     # img_col_frame_resized = general_functions.scale_by_height(img_col_frame, col_frame_h)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

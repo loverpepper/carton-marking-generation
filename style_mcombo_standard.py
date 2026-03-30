@@ -288,28 +288,12 @@ class MComboStandardStyle(BoxMarkStyle):
             bbox_product = product_font.getbbox(product_text)
             product_w = bbox_product[2] - bbox_product[0]
 
-        # product_text = sku_config.product
-        # product_font = fonts['product_font']
-        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
-        # product_w = bbox_product[2] - bbox_product[0]
-
         size_text = getattr(sku_config, 'size', None) or " " # 如果尺寸信息为空，则使用一个空格占位，避免后续计算出错
         size_font = fonts['size_font']
         bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
         size_w = bbox_size[2] - bbox_size[0]
         
-        # # 写入产品名称和尺寸信息
-        # product_text = sku_config.product
-        # size_text = sku_config.size
-        # product_font = fonts['product_font']
-        # size_font = fonts['size_font']
-        # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
-        # bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
-        # product_w = bbox_product[2] - bbox_product[0]
-        # size_w = bbox_size[2] - bbox_size[0]
-        
         gap_px = int(1 * sku_config.dpi)
-        # line_height = 7 / 0.74
         line_height = int(0.3 * sku_config.dpi) # 黑线加粗到约 0.5cm
         line_width = int(product_w * 0.85)
         total_group_height = product_font.size + line_height + size_font.size + gap_px * 2
@@ -320,7 +304,6 @@ class MComboStandardStyle(BoxMarkStyle):
         # 绘制产品名称
         product_x = (canvas_w - product_w) // 2
         ascent, descent = product_font.getmetrics()
-        # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
         product_offset_y = int(0.5 * sku_config.dpi)  # 产品信息上移约 0.5cm
         draw.text((product_x, group_start_y + ascent - product_offset_y), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
         
@@ -333,7 +316,6 @@ class MComboStandardStyle(BoxMarkStyle):
         
         # 绘制尺寸信息
         size_x = (canvas_w - size_w) // 2
-        # size_y = line_y_top + gap_px + line_height
         size_y = line_y_top + gap_px + line_height + int(0.5 * sku_config.dpi)  # 尺寸信息下移约 0.5cm
         draw.text((size_x, size_y), size_text, font=size_font, fill=(0, 0, 0))
         
@@ -399,3 +381,44 @@ class MComboStandardStyle(BoxMarkStyle):
             canvas.paste(fill_image, (base_x, base_y), mask=icon_side_text_box_resized)
         
         return canvas
+
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎升级之前（或本文件引入动态字体/坐标修正前）编写的，
+# 现已成为死代码，不再被执行。请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_front_panel：简单产品文字宽度计算（无动态字体缩放）---
+# 以下代码为原始的简单宽度获取方式，已被上方"动态调整 product 字体大小"逻辑取代：
+#
+#     # product_text = sku_config.product
+#     # product_font = fonts['product_font']
+#     # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
+#     # product_w = bbox_product[2] - bbox_product[0]
+
+# --- [旧方案] generate_front_panel：产品名称+尺寸联合计算（不支持空值处理）---
+# 以下代码为早期同时计算 product 和 size 宽度的方式，已被拆分为两步并增加空值占位符逻辑取代：
+#
+#     # # 写入产品名称和尺寸信息
+#     # product_text = sku_config.product
+#     # size_text = sku_config.size
+#     # product_font = fonts['product_font']
+#     # size_font = fonts['size_font']
+#     # bbox_product = draw.textbbox((0, 0), product_text, font=product_font)
+#     # bbox_size = draw.textbbox((0, 0), size_text, font=size_font)
+#     # product_w = bbox_product[2] - bbox_product[0]
+#     # size_w = bbox_size[2] - bbox_size[0]
+
+# --- [旧方案] generate_front_panel：旧 line_height 计算（硬编码比例）---
+#     # line_height = 7 / 0.74
+
+# --- [旧方案] generate_front_panel：产品名称绘制（未使用垂直偏移修正）---
+#     # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
+
+# --- [旧方案] generate_front_panel：尺寸文字 Y 坐标（无下移偏移修正）---
+#     # size_y = line_y_top + gap_px + line_height
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

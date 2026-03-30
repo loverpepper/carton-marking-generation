@@ -177,7 +177,6 @@ class MComboStandardStyle(BoxMarkStyle):
         icon_left_panel = self.resources[f'icon_top_box_number_{total_box_number}_{current_box_number}']
 
         icon_left_up_panel = icon_left_panel
-        # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
 
         # 计算图标的目标高度（厘米）
         target_height_cm = 18  # 默认高度18cm
@@ -195,13 +194,6 @@ class MComboStandardStyle(BoxMarkStyle):
             # 宽度没超过限制，按18cm高度缩放
             canvas_left_up = general_functions.paste_center_with_height(
                 canvas_left_up, icon_left_up_panel, height_cm=target_height_cm, dpi=sku_config.dpi)
-
-
-
-        # canvas_left_up = general_functions.paste_center_with_height(
-        #     canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
-        # canvas_left_down = general_functions.paste_center_with_height(
-        #     canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
 
         return canvas_left_up, canvas_left_down
 
@@ -228,22 +220,12 @@ class MComboStandardStyle(BoxMarkStyle):
         
         # 如果按18cm高度缩放后，宽度超过面板长度的85%，则改用宽度限制
         if scaled_width_cm > max_width_cm:
-            # canvas_right_up = general_functions.paste_center_with_width(
-            #     canvas_right_up, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
             canvas_right_down = general_functions.paste_center_with_width(
                 canvas_right_down, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
         else:
             # 宽度没超过限制，按18cm高度缩放
-            # canvas_right_up = general_functions.paste_center_with_height(
-            #     canvas_right_up, icon_right_panel_up, height_cm=target_height_cm, dpi=sku_config.dpi)
             canvas_right_down = general_functions.paste_center_with_height(
                 canvas_right_down, icon_right_panel_down, height_cm=target_height_cm, dpi=sku_config.dpi)
-
-
-        # canvas_right_up = general_functions.paste_center_with_height(
-        #     canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
-        # canvas_right_down = general_functions.paste_center_with_height(
-        #     canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
 
         return canvas_right_up, canvas_right_down
 
@@ -332,7 +314,6 @@ class MComboStandardStyle(BoxMarkStyle):
         size_w = bbox_size[2] - bbox_size[0]
 
         gap_px = int(1 * sku_config.dpi)
-        # line_height = 7 / 0.74
         line_height = int(0.3 * sku_config.dpi) # 黑线加粗到约 0.5cm
         line_width = int(product_w * 0.85)
         total_group_height = product_font.size + line_height + size_font.size + gap_px * 2
@@ -343,7 +324,6 @@ class MComboStandardStyle(BoxMarkStyle):
         # 绘制产品名称
         product_x = (canvas_w - product_w) // 2
         ascent, descent = product_font.getmetrics()
-        # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
         product_offset_y = int(0.5 * sku_config.dpi)  # 产品信息上移约 0.5cm
         draw.text((product_x, group_start_y + ascent - product_offset_y), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
 
@@ -356,7 +336,6 @@ class MComboStandardStyle(BoxMarkStyle):
 
         # 绘制尺寸信息
         size_x = (canvas_w - size_w) // 2
-        # size_y = line_y_top + gap_px + line_height
         size_y = line_y_top + gap_px + line_height + int(0.5 * sku_config.dpi)  # 尺寸信息下移约 0.5cm
         draw.text((size_x, size_y), size_text, font=size_font, fill=(0, 0, 0))
 
@@ -433,7 +412,51 @@ class MComboStandardStyle(BoxMarkStyle):
 
     def generate_side_up_down_panel(self, sku_config):
 
-        # canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
         canvas_side_up = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.half_w_px), sku_config.background_color)
         canvas_side_down = Image.new(sku_config.color_mode, (sku_config.w_px, sku_config.half_w_px), sku_config.background_color)
         return canvas_side_up, canvas_side_down
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎升级之前（或本文件引入动态缩放/坐标修正前）编写的，
+# 现已成为死代码，不再被执行。请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] generate_left_panel：固定旋转生成底部面板（已被仅生成顶部面板的逻辑取代）---
+#     # icon_left_down_panel = icon_left_panel.rotate(180, expand=True)
+
+# --- [旧方案] generate_left_panel：简单固定高度粘贴（无自适应宽度检查）---
+#     # canvas_left_up = general_functions.paste_center_with_height(
+#     #     canvas_left_up, icon_left_up_panel, height_cm=18, dpi=sku_config.dpi)
+#     # canvas_left_down = general_functions.paste_center_with_height(
+#     #     canvas_left_down, icon_left_down_panel, height_cm=10, dpi=sku_config.dpi)
+
+# --- [旧方案] generate_right_panel：同时更新右上和右下面板（右上面板实际上不需要图片）---
+#     # （在 if 分支内）
+#     # canvas_right_up = general_functions.paste_center_with_width(
+#     #     canvas_right_up, icon_right_panel_down, width_cm=max_width_cm, dpi=sku_config.dpi)
+#     # （在 else 分支内）
+#     # canvas_right_up = general_functions.paste_center_with_height(
+#     #     canvas_right_up, icon_right_panel_up, height_cm=target_height_cm, dpi=sku_config.dpi)
+
+# --- [旧方案] generate_right_panel：简单固定高度粘贴（无自适应宽度检查）---
+#     # canvas_right_up = general_functions.paste_center_with_height(
+#     #     canvas_right_up, icon_right_panel_up, height_cm=9, dpi=sku_config.dpi)
+#     # canvas_right_down = general_functions.paste_center_with_height(
+#     #     canvas_right_down, icon_right_panel_down, height_cm=17, dpi=sku_config.dpi)
+
+# --- [旧方案] generate_front_panel：旧 line_height 计算（硬编码比例）---
+#     # line_height = 7 / 0.74
+
+# --- [旧方案] generate_front_panel：产品名称绘制（未使用垂直偏移修正）---
+#     # draw.text((product_x, group_start_y + ascent), product_text, font=product_font, fill=(0, 0, 0), anchor="ls")
+
+# --- [旧方案] generate_front_panel：尺寸文字 Y 坐标（无下移偏移修正）---
+#     # size_y = line_y_top + gap_px + line_height
+
+# --- [旧方案] generate_side_up_down_panel：错误的画布尺寸（混淆了高度/宽度轴向）---
+#     # canvas = Image.new(sku_config.color_mode, (sku_config.h_px, sku_config.w_px), sku_config.background_color)
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================

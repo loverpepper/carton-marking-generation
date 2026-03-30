@@ -584,8 +584,6 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         main_panel.layout(start_x, start_y)
         main_panel.render(draw)
         
-        # icon_side_label.show()
-        
         return icon_side_label
     
     def fill_left_and_right_label_high(self, sku_config, img_label, fonts_paths):
@@ -691,13 +689,7 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         font_sku_name = ImageFont.truetype(self.font_paths['Arial Bold'], font_size_sku_name)
         font_box_number = ImageFont.truetype(self.font_paths['Arial Regular'], font_size_box_number) # 箱号和 SKU_name 字体大小一致，但使用常规体
         
-        ## 直接渲染在侧唛标签的顶部中心位置
-        # bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
-        # text_width = bbox[2] - bbox[0]
-        # text_x = (icon_side_label.width - text_width) / 2
-        # text_y = -bbox[1] + 20  # 用字体内部偏移抵消，让文字真正贴顶
-        # draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=(0, 0, 0, 0)) # 颜色为透明色，用背景色填充，达到隐藏文字的效果
-        
+        ## 使用 engine.Text 渲染文字，颜色设为背景色以隐藏（占位排版）
         sku_name_block = engine.Text(text_sku_name, font=font_sku_name, color=sku_config.background_color) # 颜色为背景色，达到隐藏文字的效果
         box_number_block = engine.Text(text_box_number, font=font_box_number, color=sku_config.background_color) # 颜色为背景色，达到隐藏文字的效果
         
@@ -774,6 +766,25 @@ class ExacmeTopAndBottomSquareTrampolineStyle(BoxMarkStyle):
         barcode_block.layout(x=560, y=195) # 先布局，获取整体宽高
         barcode_block.render(draw) # 再渲染
         
-        # icon_side_label.show()
-        
         return icon_side_label
+
+# ================================================================================
+# ⚠️  以下为历史遗留代码（旧 Pillow 直接绘制方案，已被新 layout_engine 逻辑取代，仅作参考保留）⚠️
+# 这些代码是在 layout_engine 引擎引入之前编写的，现已成为死代码，不再被执行。
+# 请勿恢复使用。
+# ================================================================================
+
+# --- [旧方案] fill_side_label_low / fill_side_label_high（侧唛顶部SKU区域）：---
+# 旧方案直接用 draw.textbbox 和 draw.text 在固定坐标渲染文字（fill=(0,0,0,0) 透明色）。
+# 现已改用 engine.Text + layout_engine Row 排版，颜色设为背景色以实现同样的隐藏效果。
+#
+#     # bbox = draw.textbbox((0, 0), text_sku_name, font=font_sku_name)
+#     # text_width = bbox[2] - bbox[0]
+#     # text_x = (icon_side_label.width - text_width) / 2
+#     # text_y = -bbox[1] + 20  # 用字体内部偏移抵消，让文字真正贴顶
+#     # draw.text((text_x, text_y), text_sku_name, font=font_sku_name, fill=(0, 0, 0, 0))
+#     #   颜色为透明色，用背景色填充，达到隐藏文字的效果
+
+# ================================================================================
+# ⚠️  历史遗留代码结束 ⚠️
+# ================================================================================
